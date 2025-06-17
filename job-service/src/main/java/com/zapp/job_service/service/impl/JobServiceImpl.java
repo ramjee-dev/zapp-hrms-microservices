@@ -1,5 +1,6 @@
 package com.zapp.job_service.service.impl;
 
+import com.zapp.job_service.dto.JobCreatedEvent;
 import com.zapp.job_service.dto.JobRequestDTO;
 import com.zapp.job_service.dto.JobResponseDTO;
 import com.zapp.job_service.entity.Job;
@@ -9,13 +10,17 @@ import com.zapp.job_service.repository.JobRepository;
 import com.zapp.job_service.service.IJobService;
 import com.zapp.job_service.service.client.ClientServiceFeignClient;
 import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 @Service
+@Slf4j
 public class JobServiceImpl implements IJobService {
 
     @Autowired
@@ -26,6 +31,9 @@ public class JobServiceImpl implements IJobService {
 
     @Autowired
     private ClientServiceFeignClient clientFeignClient;
+
+    @Autowired
+    private StreamBridge streamBridge;
 
     @Override
     public JobResponseDTO createJob(JobRequestDTO dto) {
@@ -38,7 +46,17 @@ public class JobServiceImpl implements IJobService {
 
         Job job = jobMapper.toEntity(dto);
         job = jobRepository.save(job);
+        sendCommunication(job);
         return jobMapper.toDTO(job);
+    }
+
+    private void sendCommunication(Job job){
+
+        JobCreatedEvent jobCreatedEvent = new JobCreatedEvent(job.getId(), job.getTitle(), job.getClientId()+"","anonymous",job.getCreatedAt()+"", Arrays.asList("ADMIN","DB"));
+        log.info("Sending communication request for the details: {}",jobCreatedEvent);
+        boolean send = streamBridge.send("sendCommunication-out-0", jobCreatedEvent);
+        log.info("Is the communication request successfully triggered ? : {}",send);
+
     }
 
     @Override
@@ -82,6 +100,18 @@ public class JobServiceImpl implements IJobService {
         Job job = jobRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with ID: " + id));
         jobRepository.delete(job);
+    }
+
+    @Override
+    public boolean updateCommunicationStatus(Long jobId) {
+        boolean isUpdated = false;
+        if(jobId!=null){
+            Job job = jobRepository.findById(jobId).orElseThrow(() -> new ResourceNotFoundException("Job not found with given ID: " + jobId));
+            job.setCommunicationSw(true);
+            jobRepository.save(job);
+            isUpdated=true;
+        }
+        return isUpdated;
     }
 }
 

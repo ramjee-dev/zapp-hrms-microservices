@@ -37,6 +37,8 @@ public class Job {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    private Boolean communicationSw;
+
     public enum JobStatus {
         OPEN,
         CLOSED

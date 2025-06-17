@@ -1,0 +1,22 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: message-service
+  cloud:
+    function:
+      definition: jobCreatedEmail|jobCreatedSms
+    stream:
+      bindings:
+        jobCreatedEmailjobCreatedSms-in-0:
+          destination: send-communication
+          group: ${spring.application.name}
+        jobCreatedEmailjobCreatedSms-out-0:
+          destination: communication-sent
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 10s

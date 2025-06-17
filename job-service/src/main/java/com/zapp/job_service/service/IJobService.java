@@ -18,6 +18,8 @@ public interface IJobService {
     JobResponseDTO updateJob(Long id, JobRequestDTO dto);
 
     void deleteJob(Long id);
+
+    boolean updateCommunicationStatus(Long jobId);
 }
 
 

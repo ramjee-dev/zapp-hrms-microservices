@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a03bcff3-eb89-4fa4-abcb-6c4678f153c8" name="Changes" comment="Initial commit: Zapp HRMS Microservices" />
+    <list default="true" id="a03bcff3-eb89-4fa4-abcb-6c4678f153c8" name="Changes" comment="implemented User-service APIs">
+      <change beforePath="$PROJECT_DIR$/candidate-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/entity/Job.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/entity/Job.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobService.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/impl/JobServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/impl/JobServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/resources/application.yml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,8 +20,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -27,12 +34,12 @@
     &quot;assignee&quot;: &quot;ramjee-dev&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "git@github.com:ramjee-dev/zapp-hrms-microservices.git",
-    "accountId": "cb4cd503-873f-4755-8d40-264f1275ec72"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:ramjee-dev/zapp-hrms-microservices.git&quot;,
+    &quot;accountId&quot;: &quot;cb4cd503-873f-4755-8d40-264f1275ec72&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 0
@@ -47,6 +54,12 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.CandidateServiceApplication.executor": "Debug",
+    "Application.ClientServiceApplication.executor": "Debug",
+    "Application.EurekaServiceApplication.executor": "Run",
+    "Application.JobServiceApplication.executor": "Debug",
+    "Application.MessageServiceApplication.executor": "Debug",
+    "Application.UserServiceApplication.executor": "Debug",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -56,6 +69,82 @@
     "settings.editor.selected.configurable": "preferences.fileTypes"
   }
 }]]></component>
+  <component name="RunManager" selected="Application.MessageServiceApplication">
+    <configuration name="ClientServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.zapp.client_service.ClientServiceApplication" />
+      <module name="client-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.zapp.client_service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EurekaServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.zapp.eureka_service.EurekaServiceApplication" />
+      <module name="eureka-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.zapp.eureka_service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="JobServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.zapp.job_service.JobServiceApplication" />
+      <module name="job-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.zapp.job_service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MessageServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.zapp.message_service.MessageServiceApplication" />
+      <module name="message-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.zapp.message_service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.zapp.user_service.UserServiceApplication" />
+      <module name="user-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.zapp.user_service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.MessageServiceApplication" />
+        <item itemvalue="Application.JobServiceApplication" />
+        <item itemvalue="Application.ClientServiceApplication" />
+        <item itemvalue="Application.EurekaServiceApplication" />
+        <item itemvalue="Application.UserServiceApplication" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="a03bcff3-eb89-4fa4-abcb-6c4678f153c8" name="Changes" comment="" />
@@ -72,7 +161,39 @@
       <option name="project" value="LOCAL" />
       <updated>1749833862196</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="user service skeleton created">
+      <option name="closed" value="true" />
+      <created>1750013446163</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1750013446163</updated>
+    </task>
+    <task id="LOCAL-00003" summary="usercontroller create api started working on it">
+      <option name="closed" value="true" />
+      <created>1750014377555</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1750014377555</updated>
+    </task>
+    <task id="LOCAL-00004" summary="implemented User-service APIs">
+      <option name="closed" value="true" />
+      <created>1750094825015</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1750094825015</updated>
+    </task>
+    <task id="LOCAL-00005" summary="implemented User-service APIs">
+      <option name="closed" value="true" />
+      <created>1750095147727</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1750095147727</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -89,6 +210,20 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit with all microservices" />
     <MESSAGE value="Initial commit: Zapp HRMS Microservices" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial commit: Zapp HRMS Microservices" />
+    <MESSAGE value="user service skeleton created" />
+    <MESSAGE value="usercontroller create api started working on it" />
+    <MESSAGE value="implemented User-service APIs" />
+    <option name="LAST_COMMIT_MESSAGE" value="implemented User-service APIs" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/message-service/src/main/java/com/zapp/message_service/function/MessageFunction.java</url>
+          <line>23</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -2,16 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile name="Annotation profile for job-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
-        </processorPath>
-        <module name="job-service" />
-      </profile>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -25,8 +16,10 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
         </processorPath>
+        <module name="job-service" />
         <module name="candidate-service" />
         <module name="user-service" />
+        <module name="message-service" />
         <module name="client-service" />
       </profile>
     </annotationProcessing>
@@ -37,6 +30,7 @@
       <module name="client-service" options="-parameters" />
       <module name="eureka-service" options="-parameters" />
       <module name="job-service" options="-parameters" />
+      <module name="message-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>
