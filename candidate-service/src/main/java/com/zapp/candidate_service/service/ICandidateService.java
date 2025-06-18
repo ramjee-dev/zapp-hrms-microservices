@@ -19,5 +19,9 @@ public interface ICandidateService {
     Candidate updateCandidateStatus(Long id, Candidate.Status status);
 
     void deleteCandidate(Long id);
+
+    boolean updateCommunicationStatus(Long id);
+
+    public boolean updateStatusCommunicationMap(Long id, String status);
 }
 

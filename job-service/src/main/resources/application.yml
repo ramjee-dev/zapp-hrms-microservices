@@ -20,9 +20,9 @@ spring:
     stream:
       bindings:
         sendCommunication-out-0:
-          destination: send-communication
+          destination: job-created-events
         updateCommunication-in-0:
-          destination: communication-sent
+          destination: job-communication-sent
           group: ${spring.application.name}
 
   rabbitmq:

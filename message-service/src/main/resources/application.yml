@@ -6,14 +6,29 @@ spring:
     name: message-service
   cloud:
     function:
-      definition: jobCreatedEmail|jobCreatedSms
+      definition: jobCreatedEmail|jobCreatedSms; candidateAddedEmail|candidateAddedSms; candidateStatusChanged
     stream:
       bindings:
+        # 🔹 Job Created Bindings
         jobCreatedEmailjobCreatedSms-in-0:
-          destination: send-communication
+          destination: job-created-events
           group: ${spring.application.name}
         jobCreatedEmailjobCreatedSms-out-0:
-          destination: communication-sent
+          destination: job-communication-sent
+
+        # 🔹 Candidate Added Bindings
+        candidateAddedEmailcandidateAddedSms-in-0:
+          destination: candidate-added-events
+          group: ${spring.application.name}
+        candidateAddedEmailcandidateAddedSms-out-0:
+          destination: candidate-communication-sent
+
+        # 🔹 Candidate Status Changed Binding (single input/output)
+        candidateStatusChanged-in-0:
+          destination: candidate-status-events
+          group: ${spring.application.name}
+        candidateStatusChanged-out-0:
+          destination: candidate-status-communication-sent
   rabbitmq:
     host: localhost
     port: 5672

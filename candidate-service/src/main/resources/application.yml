@@ -15,6 +15,35 @@ spring:
       ddl-auto: update
     show-sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
+  cloud:
+    function:
+      definition: updateCommunication;updateStatusCommunication
+    stream:
+      bindings:
+        # 🔹 Candidate Added Event (output)
+        sendCommunication-out-0:
+          destination: candidate-added-events
+
+        # 🔹 Candidate Added Communication Acknowledgment (input)
+        updateCommunication-in-0:
+          destination: candidate-communication-sent
+          group: ${spring.application.name}
+
+        # 🔹 Candidate Status Changed Event (output)
+        sendStatusCommunication-out-0:
+          destination: candidate-status-events
+
+        # 🔹 Candidate Status Communication Acknowledgment (input)
+        updateStatusCommunication-in-0:
+          destination: candidate-status-communication-sent
+          group: ${spring.application.name}
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
+    port: 5672
+    connection-timeout: 10s
+
 
 eureka:
   instance:
