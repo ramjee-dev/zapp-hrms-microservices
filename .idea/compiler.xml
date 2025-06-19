@@ -9,7 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="eureka-service" />
       </profile>
-      <profile name="Annotation profile for candidate-service" enabled="true">
+      <profile name="Annotation profile for gateway-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -20,6 +20,7 @@
         <module name="candidate-service" />
         <module name="user-service" />
         <module name="message-service" />
+        <module name="gateway-service" />
         <module name="client-service" />
       </profile>
     </annotationProcessing>
@@ -29,6 +30,7 @@
       <module name="candidate-service" options="-parameters" />
       <module name="client-service" options="-parameters" />
       <module name="eureka-service" options="-parameters" />
+      <module name="gateway-service" options="-parameters" />
       <module name="job-service" options="-parameters" />
       <module name="message-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
