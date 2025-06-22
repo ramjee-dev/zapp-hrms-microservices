@@ -25,7 +25,10 @@ public class GatewayServiceApplication {
 						.path("/zapphrms/client-service/**")
 						.filters(f->f.rewritePath("/zapphrms/client-service/(?<segment>.*)","/${segment}")
 								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
-								)
+								.retry(config->config
+										.setRetries(3)
+										.setBackoff(Duration.ofMillis(100),Duration.ofMillis(1000),2,true)
+										.setMethods(HttpMethod.GET)))
 						.uri("lb://CLIENT-SERVICE"))
 				.route(p->p
 						.path("/zapphrms/job-service/**")

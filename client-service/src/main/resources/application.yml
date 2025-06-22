@@ -14,10 +14,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
     database: mysql
 
 eureka:
@@ -28,6 +28,16 @@ eureka:
     fetchRegistry: true
     serviceUrl:
       defaultZone: "http://localhost:8070/eureka/"
+
+resilience4j.retry:
+  configs:
+    default:
+      maxAttempts: 3
+      waitDuration: 1000
+      enableExponentialBackoff: true
+      exponentialBackoffMultiplier: 2
+      ignoreExceptions:
+        - java.lang.NullPointerException
 
 
 
@@ -51,7 +61,7 @@ eureka:
 logging:
   level:
     org.springframework: INFO
-    com.zapp.clientservice: DEBUG
+    com.zapp.client_service: DEBUG
 
 management:
   endpoints:
