@@ -22,12 +22,14 @@ public class GatewayServiceApplication {
 				.route(p->p
 						.path("/zapphrms/client-service/**")
 						.filters(f->f.rewritePath("/zapphrms/client-service/(?<segment>.*)","/${segment}")
-								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
+                                )
 						.uri("lb://CLIENT-SERVICE"))
 				.route(p->p
 						.path("/zapphrms/job-service/**")
 						.filters(f->f.rewritePath("/zapphrms/job-service/(?<segment>.*)","/${segment}")
-								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
+                                .circuitBreaker(config->config.setName("jobsCircuitBreaker").setFallbackUri("forward:/fallback/job-service")))
 						.uri("lb://JOB-SERVICE"))
 				.route(p->p
 						.path("/zapphrms/candidate-service/**")
