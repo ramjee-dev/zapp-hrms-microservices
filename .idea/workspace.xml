@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a03bcff3-eb89-4fa4-abcb-6c4678f153c8" name="Changes" comment="implemented User-service APIs">
-      <change beforePath="$PROJECT_DIR$/client-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/controller/ClientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/controller/ClientController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/controller/CandidateController.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/controller/CandidateController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-service/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gateway-service/src/main/java/com/zapp/gateway_service/GatewayServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-service/src/main/java/com/zapp/gateway_service/GatewayServiceApplication.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -95,6 +96,19 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="EurekaServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.zapp.eureka_service.EurekaServiceApplication" />
+      <module name="eureka-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.zapp.eureka_service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="GatewayServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.zapp.gateway_service.GatewayServiceApplication" />
       <module name="gateway-service" />
@@ -121,26 +135,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MessageServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.zapp.message_service.MessageServiceApplication" />
-      <module name="message-service" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.zapp.message_service.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Application.GatewayServiceApplication" />
-        <item itemvalue="Application.ClientServiceApplication" />
         <item itemvalue="Application.CandidateServiceApplication" />
+        <item itemvalue="Application.ClientServiceApplication" />
         <item itemvalue="Application.JobServiceApplication" />
-        <item itemvalue="Application.MessageServiceApplication" />
+        <item itemvalue="Application.EurekaServiceApplication" />
       </list>
     </recent_temporary>
   </component>
