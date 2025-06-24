@@ -1,0 +1,199 @@
+services:
+  eureka-service:
+    image: ramjee92/eureka-service:s11
+    container_name: eureka-service
+    ports:
+      - 8070:8070
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    environment:
+      SPRING_APPLICATION_NAME: "eureka-service"
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - zapphrms
+
+  client-service:
+    image: ramjee92/client-service:s11
+    container_name: client-service
+    ports:
+      - 8081:8081
+    healthcheck:
+      test: "curl --fail --silent localhost:8081/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      eureka-service:
+        condition: service_healthy
+      zapphrmsdb:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "client-service"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://zapphrmsdb:3306/zappdb"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8070/eureka/
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - zapphrms
+
+  job-service:
+    image: ramjee92/job-service:s11
+    container_name: job-service
+    ports:
+      - 8082:8082
+    healthcheck:
+      test: "curl --fail --silent localhost:8082/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    environment:
+      SPRING_APPLICATION_NAME: "job-service"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://zapphrmsdb:3306/zappdb"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8070/eureka/
+      SPRING_RABBITMQ_HOST: "rabbit"
+    depends_on:
+      eureka-service:
+        condition: service_healthy
+      rabbit:
+        condition: service_healthy
+      zapphrmsdb:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - zapphrms
+
+  candidate-service:
+    image: ramjee92/candidate-service:s11
+    container_name: candidate-service
+    ports:
+      - 8083:8083
+    healthcheck:
+      test: "curl --fail --silent localhost:8083/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      eureka-service:
+        condition: service_healthy
+      rabbit:
+        condition: service_healthy
+      zapphrmsdb:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "candidate-service"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://zapphrmsdb:3306/zappdb"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8070/eureka/
+      SPRING_RABBITMQ_HOST: "rabbit"
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - zapphrms
+
+  gateway-service:
+    image: ramjee92/gateway-service:s11
+    container_name: gateway-service
+    ports:
+      - 8072:8072
+    depends_on:
+      client-service:
+        condition: service_healthy
+      job-service:
+        condition: service_healthy
+      candidate-service:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "gateway-service"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8070/eureka/
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - zapphrms
+
+  message-service:
+    image: ramjee92/message-service:s11
+    container_name: message-service
+    ports:
+      - 8085:8085
+    depends_on:
+      rabbit:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "message-service"
+      SPRING_RABBITMQ_HOST: "rabbit"
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - zapphrms
+
+  zapphrmsdb:
+    image: mysql:8.4
+    container_name: zapp-hrms-db
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-h","localhost"]
+      timeout: 10s
+      retries: 10
+      interval: 10s
+      start_period: 10s
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: zappdb
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - zapphrms
+
+
+  rabbit:
+    image: rabbitmq:3.13-management
+    hostname: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - zapphrms
+
+
+networks:
+  zapphrms:
+    driver: "bridge"

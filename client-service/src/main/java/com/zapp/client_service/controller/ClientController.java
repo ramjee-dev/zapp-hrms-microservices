@@ -31,8 +31,7 @@ public class ClientController {
     @GetMapping
     public Page<ClientDTO> getAll(Pageable pageable) {
         log.debug("getALLClients API invoked");
-        throw new NullPointerException("");
-//        return service.getAllClients(pageable);
+        return service.getAllClients(pageable);
     }
 
     public Page<ClientDTO> getAllClientsFallback(Pageable pageable, Throwable throwable) {
@@ -46,8 +45,7 @@ public class ClientController {
     @GetMapping("/{id}")
     public ClientDTO getById(@PathVariable Long id) {
         log.debug(" Get Client By ID API invoked");
-        throw new RuntimeException("");
-//        return service.getClientById(id);
+        return service.getClientById(id);
     }
 
     @PutMapping("/{id}")
