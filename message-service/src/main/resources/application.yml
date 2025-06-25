@@ -35,3 +35,12 @@ spring:
     username: guest
     password: guest
     connection-timeout: 10s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    tags:
+      application: ${spring.application.name}
