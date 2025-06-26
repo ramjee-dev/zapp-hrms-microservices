@@ -47,6 +47,14 @@ management:
     tags:
       application: ${spring.application.name}
 
+logging:
+  level:
+    com:
+      zapp:
+        gateway_service: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+
 info:
   app:
     name: "gateway-service"

@@ -60,8 +60,11 @@ resilience4j.retry:
 
 logging:
   level:
-    org.springframework: INFO
-    com.zapp.client_service: DEBUG
+    com:
+      zapp:
+        client_service: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
 
 management:
   endpoints:

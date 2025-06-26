@@ -70,6 +70,13 @@ info:
     description: Zapp_Mini Job Service Application
     version: 1.0.0
 
+logging:
+  level:
+    com:
+      zapp:
+        job_service: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
 
   jackson:
     serialization:
