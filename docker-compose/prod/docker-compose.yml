@@ -1,4 +1,21 @@
 services:
+  keycloak-service:
+    image: quay.io/keycloak/keycloak:22.0.1
+    container_name: keycloak-service
+    ports:
+      - 8080:8080
+    environment:
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+    command: "start-dev"
+    deploy:
+      resources:
+        limits:
+          memory: 600m
+    networks:
+      - zapphrms
+
+
   eureka-service:
     image: ramjee92/eureka-service:s11
     container_name: eureka-service
@@ -20,15 +37,13 @@ services:
     deploy:
       resources:
         limits:
-          memory: 700m
+          memory: 500m
     networks:
       - zapphrms
 
   client-service:
     image: ramjee92/client-service:s11
     container_name: client-service
-    ports:
-      - 8081:8081
     healthcheck:
       test: "curl --fail --silent localhost:8081/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
@@ -54,15 +69,13 @@ services:
     deploy:
       resources:
         limits:
-          memory: 700m
+          memory: 500m
     networks:
       - zapphrms
 
   job-service:
     image: ramjee92/job-service:s11
     container_name: job-service
-    ports:
-      - 8082:8082
     healthcheck:
       test: "curl --fail --silent localhost:8082/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
@@ -91,15 +104,13 @@ services:
     deploy:
       resources:
         limits:
-          memory: 700m
+          memory: 500m
     networks:
       - zapphrms
 
   candidate-service:
     image: ramjee92/candidate-service:s11
     container_name: candidate-service
-    ports:
-      - 8083:8083
     healthcheck:
       test: "curl --fail --silent localhost:8083/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
@@ -128,7 +139,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 700m
+          memory: 500m
     networks:
       - zapphrms
 
@@ -152,10 +163,11 @@ services:
       OTEL_METRICS_EXPORTER: none
       OTEL_LOGS_EXPORTER: none
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8070/eureka/
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak-service:8080/realms/master/protocol/openid-connect/certs"
     deploy:
       resources:
         limits:
-          memory: 700m
+          memory: 600m
     networks:
       - zapphrms
 
@@ -178,7 +190,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 700m
+          memory: 500m
     networks:
       - zapphrms
 
@@ -218,7 +230,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 700m
+          memory: 400m
     networks:
       - zapphrms
 
