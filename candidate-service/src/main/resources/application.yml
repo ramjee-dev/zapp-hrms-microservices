@@ -37,12 +37,12 @@ spring:
         updateStatusCommunication-in-0:
           destination: candidate-status-communication-sent
           group: ${spring.application.name}
-  rabbitmq:
-    host: localhost
-    username: guest
-    password: guest
-    port: 5672
-    connection-timeout: 10s
+      kafka:
+        binder:
+          brokers:
+            - localhost:9092
+
+
 
 
 eureka:
