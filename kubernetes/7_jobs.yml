@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jobs-deployment
+  labels:
+    app: jobs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jobs
+  template:
+    metadata:
+      labels:
+        app: jobs
+    spec:
+      containers:
+        - name: job-service
+          image: ramjee92/job-service:s11
+          ports:
+            - containerPort: 8082
+          env:
+            - name: SPRING_APPLICATION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: JOBS_APPLICATION_NAME
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: SPRING_DATASOURCE_URL
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: MYSQL_DB_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: MYSQL_DB_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: job-service
+  labels:
+    app: jobs
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8082
+  selector:
+    app: jobs

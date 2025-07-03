@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a03bcff3-eb89-4fa4-abcb-6c4678f153c8" name="Changes" comment="implemented User-service APIs" />
+    <list default="true" id="a03bcff3-eb89-4fa4-abcb-6c4678f153c8" name="Changes" comment="implemented User-service APIs">
+      <change beforePath="$PROJECT_DIR$/kubernetes/configmap.yml" beforeDir="false" afterPath="$PROJECT_DIR$/kubernetes/2_configmap.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kubernetes/configserver.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/kubernetes/eurekaserver.yml" beforeDir="false" afterPath="$PROJECT_DIR$/kubernetes/3_eurekaserver.yml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -60,7 +64,7 @@
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/nanir/OneDrive/Desktop/Java Backend Developer/Project/zapp-hrms",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+    "settings.editor.selected.configurable": "preferences.lookFeel"
   }
 }]]></component>
   <component name="RunManager" selected="Application.GatewayServiceApplication">

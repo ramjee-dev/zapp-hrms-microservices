@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clients-deployment
+  labels:
+    app: clients
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: clients
+  template:
+    metadata:
+      labels:
+        app: clients
+    spec:
+      containers:
+        - name: client-service
+          image: ramjee92/client-service:s11
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_APPLICATION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: CLIENTS_APPLICATION_NAME
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: SPRING_DATASOURCE_URL
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: MYSQL_DB_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: MYSQL_DB_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-service
+  labels:
+    app: clients
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8081
+  selector:
+    app: clients

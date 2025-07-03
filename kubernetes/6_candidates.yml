@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: candidates-deployment
+  labels:
+    app: candidates
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: candidates
+  template:
+    metadata:
+      labels:
+        app: candidates
+    spec:
+      containers:
+        - name: candidate-service
+          image: ramjee92/candidate-service:s11
+          ports:
+            - containerPort: 8083
+          env:
+            - name: SPRING_APPLICATION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: CANDIDATES_APPLICATION_NAME
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: SPRING_DATASOURCE_URL
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: MYSQL_DB_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: zapphrms-configmap
+                  key: MYSQL_DB_PASSWORD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: candidate-service
+  labels:
+    app: candidates
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8083
+  selector:
+    app: candidates

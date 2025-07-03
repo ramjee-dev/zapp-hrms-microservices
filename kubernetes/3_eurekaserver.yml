@@ -19,6 +19,12 @@ spec:
         image: ramjee92/eureka-service:s11
         ports:
         - containerPort: 8070
+        env:
+          - name: SPRING_APPLICATION_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: zapphrms-configmap
+                key: EUREKA_APPLICATION_NAME
 ---
 apiVersion: v1
 kind: Service

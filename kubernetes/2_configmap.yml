@@ -12,3 +12,7 @@ data:
   SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak-service:8080/realms/master/protocol/openid-connect/certs"
   KEYCLOAK_ADMIN: "admin"
   KEYCLOAK_ADMIN_PASSWORD: "admin"
+  MYSQL_DB_NAME: "zappdb"
+  MYSQL_DB_USERNAME: "root"
+  MYSQL_DB_PASSWORD: "root"
+  SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/zappdb"
