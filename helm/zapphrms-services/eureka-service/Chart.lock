@@ -1,0 +1,6 @@
+dependencies:
+- name: zapphrms-common
+  repository: file://../../zapphrms-common
+  version: 0.1.0
+digest: sha256:39499ed3dc6360a50a34db84670e76986c99256156aeb11c4a0cd2cadd80c5e1
+generated: "2025-07-08T22:18:35.9578478+05:30"

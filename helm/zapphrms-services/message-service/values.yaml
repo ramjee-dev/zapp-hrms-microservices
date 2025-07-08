@@ -1,0 +1,22 @@
+
+deploymentName: messages-deployment
+serviceName: message-service
+appName: message-service
+appLabel: message-service
+
+replicaCount: 1
+
+image:
+  repository: ramjee92/message-service
+  tag: s11
+
+service:
+  type: ClusterIP
+  port: 8084
+  targetPort: 8084
+
+appname_enabled: true
+eureka_enabled: false
+resourceserver_enabled: false
+otel_enabled: false
+kafka_enabled: true

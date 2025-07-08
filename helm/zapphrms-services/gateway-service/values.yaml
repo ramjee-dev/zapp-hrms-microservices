@@ -1,0 +1,23 @@
+deploymentName: gatewayserver-deployment
+serviceName: gateway-service
+appLabel: gateway-service
+appName: gateway-service
+
+replicaCount: 1
+
+image:
+  repository: ramjee92/gateway-service
+  tag: s11
+
+containerPort: 8072
+
+service:
+  type: LoadBalancer
+  port: 8072
+  targetPort: 8072
+
+appname_enabled: true
+eureka_enabled: true
+resourceserver_enabled: true
+otel_enabled: true
+kafka_enabled: false

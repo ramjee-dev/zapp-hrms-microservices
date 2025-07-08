@@ -1,0 +1,24 @@
+
+deploymentName: jobs-deployment
+serviceName: job-service
+appLabel: job-service
+appName: job-service
+
+replicaCount: 1
+
+image:
+  repository: ramjee92/job-service
+  tag: s11
+
+containerPort: 8082
+
+service:
+  type: ClusterIP
+  port: 8082
+  targetPort: 8082
+
+appname_enabled: true
+eureka_enabled: true
+resourceserver_enabled: false
+otel_enabled: true
+kafka_enabled: true

@@ -1,0 +1,22 @@
+
+deploymentName: candidates-deployment
+serviceName: candidate-service
+appName: candidate-service
+appLabel: candidate-service
+
+replicaCount: 1
+
+image:
+  repository: ramjee92/candidate-service
+  tag: s11
+
+service:
+  type: ClusterIP
+  port: 8083
+  targetPort: 8083
+
+appname_enabled: true
+eureka_enabled: true
+resourceserver_enabled: false
+otel_enabled: true
+kafka_enabled: true

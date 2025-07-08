@@ -1,0 +1,24 @@
+
+deploymentName: eurekaserver-deployment
+serviceName: eureka-service
+appLabel: eureka-service
+appName: eureka-service
+
+replicaCount: 1
+
+image:
+  repository: ramjee92/eureka-service
+  tag: s11
+
+containerPort: 8070
+
+service:
+  type: ClusterIP
+  port: 8070
+  targetPort: 8070
+
+appname_enabled: true
+eureka_enabled: true
+resourceserver_enabled: false
+otel_enabled: true
+kafka_enabled: false
