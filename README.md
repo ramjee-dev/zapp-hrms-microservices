@@ -73,9 +73,6 @@ Role-based access control is implemented using **Keycloak** with **OAuth2** and 
 - Use Docker Compose to spin up all microservices
 - Prebuilt Jib images are available for each service
 
-```bash
-docker-compose up --build
-
 ☁️ Kubernetes Setup
 Helm charts used for 3rd-party components (Keycloak, Kafka, Prometheus, etc.)
 
@@ -91,3 +88,5 @@ Ramjee Ambedkar
 
 ⭐️ Give it a Star!
 If you found this helpful, feel free to ⭐ the repo!
+
+
