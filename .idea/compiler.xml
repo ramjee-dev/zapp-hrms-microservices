@@ -8,8 +8,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="eureka-service" />
+        <module name="common" />
       </profile>
-      <profile name="Annotation profile for message-service" enabled="true">
+      <profile name="Annotation profile for user-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -27,13 +28,13 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="candidate-service" options="-parameters" />
-      <module name="client-service" options="-parameters" />
-      <module name="eureka-service" options="-parameters" />
-      <module name="gateway-service" options="-parameters" />
-      <module name="job-service" options="-parameters" />
-      <module name="message-service" options="-parameters" />
-      <module name="user-service" options="-parameters" />
+      <module name="candidate-service" options="" />
+      <module name="client-service" options="" />
+      <module name="eureka-service" options="" />
+      <module name="gateway-service" options="" />
+      <module name="job-service" options="" />
+      <module name="message-service" options="" />
+      <module name="user-service" options="" />
     </option>
   </component>
 </project>
