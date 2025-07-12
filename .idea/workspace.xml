@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a03bcff3-eb89-4fa4-abcb-6c4678f153c8" name="Changes" comment="implemented User-service APIs">
-      <change afterPath="$PROJECT_DIR$/zapp-bom/common/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zapp-bom/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/candidate-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/eureka-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/helm/kube-prometheus/charts/kube-prometheus-crds-0.1.0.tgz" beforeDir="false" afterPath="$PROJECT_DIR$/helm/kube-prometheus/charts/kube-prometheus-crds-0.1.0.tgz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/message-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/message-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/pom.xml" afterDir="false" />
-    </list>
+    <list default="true" id="a03bcff3-eb89-4fa4-abcb-6c4678f153c8" name="Changes" comment="implemented User-service APIs" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
