@@ -10,17 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Entity
-@Table(name = "candidates")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter@Setter@NoArgsConstructor@AllArgsConstructor
 @Builder
-public class Candidate {
+public class Candidate extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long candidateId;
 
     @Column(nullable = false)
     private String fullName;
@@ -37,9 +33,6 @@ public class Candidate {
 
     @Lob
     private String remarks;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
 
     // ✅ For tracking communication after candidate is added to job
     @Column(name = "communication_sw")

@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.ramjee</groupId>
-		<artifactId>zapp-bom</artifactId>
+		<artifactId>zapphrms-bom</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../zapp-bom/pom.xml</relativePath> <!-- lookup parent from repository -->
+		<relativePath>../zapphrms-bom/pom.xml</relativePath> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.zapp</groupId>
+	<groupId>com.ramjee</groupId>
 	<artifactId>eureka-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>eureka-service</name>

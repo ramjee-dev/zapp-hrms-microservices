@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.ramjee</groupId>
-		<artifactId>zapp-bom</artifactId>
+		<artifactId>zapphrms-bom</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../zapp-bom/pom.xml</relativePath> <!-- lookup parent from repository -->
+		<relativePath>../zapphrms-bom/pom.xml</relativePath> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.zapp</groupId>
+	<groupId>com.ramjee</groupId>
 	<artifactId>gateway-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>gateway-service</name>
@@ -30,13 +30,14 @@
 			<artifactId>micrometer-registry-prometheus</artifactId>
 			<version>${micrometer.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis-reactive</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
+			<artifactId>spring-cloud-starter-gateway</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

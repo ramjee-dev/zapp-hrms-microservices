@@ -41,7 +41,7 @@ public class CandidateServiceImpl implements ICandidateService {
 
     private void sendCommunication(Candidate candidate) {
         CandidateAddedEvent event = new CandidateAddedEvent(
-                candidate.getId(),
+                candidate.getCandidateId(),
                 candidate.getFullName(),
                 candidate.getJobId() + "",
                 "default client name",
@@ -103,7 +103,7 @@ public class CandidateServiceImpl implements ICandidateService {
 
     private void sendStatusChangedCommunication(Candidate candidate) {
         CandidateStatusChangedEvent event = new CandidateStatusChangedEvent(
-                candidate.getId(),
+                candidate.getCandidateId(),
                 candidate.getFullName(),
                 candidate.getJobId() + "",
                 "default client name",

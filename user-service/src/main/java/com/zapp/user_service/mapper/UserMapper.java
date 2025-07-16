@@ -11,7 +11,7 @@ public class UserMapper {
         if (user == null) return null;
 
         UserDto dto = new UserDto();
-        dto.setId(user.getId());
+        dto.setId(user.getUserId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setRole(user.getRole());
@@ -23,7 +23,7 @@ public class UserMapper {
         if (dto == null) return null;
 
         User user = new User();
-        user.setId(dto.getId()); // usually null on create, but helpful on update
+        user.setUserId(dto.getId()); // usually null on create, but helpful on update
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());

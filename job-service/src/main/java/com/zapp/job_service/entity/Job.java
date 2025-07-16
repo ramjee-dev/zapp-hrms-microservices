@@ -11,18 +11,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Table(name = "jobs")
-public class Job {
+@Setter@Getter@AllArgsConstructor@NoArgsConstructor
+public class Job extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long jobId;
 
-    @NotBlank
     private String title;
 
     @Column(columnDefinition = "TEXT")
@@ -33,9 +28,6 @@ public class Job {
 
     @Column(name = "client_id", nullable = false)
     private Long clientId;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
 
     private Boolean communicationSw;
 

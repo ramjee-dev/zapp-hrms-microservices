@@ -1,69 +1,86 @@
 package com.zapp.client_service.service.impl;
 
-import com.zapp.client_service.dto.ClientDTO;
+import com.zapp.client_service.dto.ClientDto;
 import com.zapp.client_service.entity.Client;
+import com.zapp.client_service.exception.ClientAlreadyExistsException;
+import com.zapp.client_service.exception.ResourceNotFoundException;
+import com.zapp.client_service.mapper.ClientMapper;
 import com.zapp.client_service.repository.ClientRepository;
 import com.zapp.client_service.service.IClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
 public class ClientServiceImpl implements IClientService {
 
-    private final ClientRepository repository;
+    private final ClientRepository clientRepository;
 
+    /**
+     *  @param ClientDto - ClientDto object
+     */
     @Override
-    public ClientDTO createClient(ClientDTO dto) {
-        if (repository.existsByName(dto.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Client name already exists");
+    public void createClient(ClientDto clientDto) {
+        if (clientRepository.existsByName(clientDto.getName())) {
+            throw new ClientAlreadyExistsException("Client name already exists");
         }
-        Client client = Client.builder()
-                .name(dto.getName())
-                .location(dto.getLocation())
-                .status(dto.getStatus() != null ? dto.getStatus() : Client.Status.ACTIVE)
-                .build();
-        repository.save(client);
-        dto.setId(client.getId());
-        return dto;
+        Client client = ClientMapper.mapToClient(clientDto,new Client());
+        clientRepository.save(client);
     }
 
     @Override
-    public Page<ClientDTO> getAllClients(Pageable pageable) {
-        return repository.findAll(pageable)
-                .map(c -> new ClientDTO(c.getId(), c.getName(), c.getLocation(), c.getStatus()));
+    public Page<ClientDto> getAllClients(Pageable pageable) {
+        return clientRepository.findAll(pageable)
+                .map(c -> new ClientDto(c.getName(), c.getLocation(), c.getStatus()));
     }
 
+    /**
+     * @param clientId - Input ClientId
+     * @return Client Details based on given ClientId
+     */
     @Override
-    public ClientDTO getClientById(Long id) {
-        Client c = repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
-        return new ClientDTO(c.getId(), c.getName(), c.getLocation(), c.getStatus());
+    public ClientDto fetchClientById(Long clientId) {
+        Client client = clientRepository.findById(clientId).orElseThrow(() ->
+                new ResourceNotFoundException("Client", "ClientId",clientId+""));
+        return ClientMapper.mapToClientDto(client,new ClientDto());
     }
 
+    /**
+     * @param clientId - Input ClientId
+     * @param clientDto - Input ClientDto Object
+     * @return boolean indicating if the update of Client details is successful or not
+     */
     @Override
-    public ClientDTO updateClient(Long id, ClientDTO dto) {
-        Client existing = repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
+    public boolean updateClient(Long clientId, ClientDto clientDto) {
+        boolean isUpdated = false;
 
-        existing.setName(dto.getName());
-        existing.setLocation(dto.getLocation());
-        existing.setStatus(dto.getStatus());
-
-        repository.save(existing);
-        return new ClientDTO(existing.getId(), existing.getName(), existing.getLocation(), existing.getStatus());
-    }
-
-    @Override
-    public void deleteClient(Long id) {
-        if (!repository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found");
+        if(clientDto!=null && clientId!=null){
+            Client client = clientRepository.findById(clientId).orElseThrow(() ->
+                    new ResourceNotFoundException("Client", "ClientId", clientId + ""));
+            ClientMapper.mapToClient(clientDto,client);
+            clientRepository.save(client);
+            isUpdated = true;
         }
-        repository.deleteById(id);
+        return isUpdated;
+    }
+
+    /**
+     * @param clientId - Input ClientId
+     * @return boolean indicating if the delete of Client details is successful or not
+     */
+    @Override
+    public boolean deleteClient(Long clientId) {
+        boolean isDeleted = false;
+        if(clientId!=null) {
+            if (!clientRepository.existsById(clientId)) {
+                throw new ResourceNotFoundException("Client", "ClientId", clientId + "");
+            }
+            clientRepository.deleteById(clientId);
+            isDeleted = true;
+        }
+        return isDeleted;
     }
 
 }

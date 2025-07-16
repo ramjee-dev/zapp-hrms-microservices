@@ -14,6 +14,8 @@
         <option value="$PROJECT_DIR$/zapp-bom/pom.xml" />
         <option value="$PROJECT_DIR$/common/pom.xml" />
         <option value="$PROJECT_DIR$/zapp-bom/common/pom.xml" />
+        <option value="$PROJECT_DIR$/zapphrms-bom/pom.xml" />
+        <option value="$PROJECT_DIR$/zapphrms-bom/common/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
