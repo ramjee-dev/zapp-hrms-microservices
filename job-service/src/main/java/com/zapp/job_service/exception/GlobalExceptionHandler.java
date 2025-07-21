@@ -1,7 +1,6 @@
-package com.zapp.client_service.exception;
+package com.zapp.job_service.exception;
 
-
-import com.zapp.client_service.dto.ErrorResponseDto;
+import com.zapp.job_service.dto.ErrorResponseDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -22,8 +21,20 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(ClientAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponseDto> handleClientAlreadyExistsException(ClientAlreadyExistsException exception, WebRequest webRequest){
+    @ExceptionHandler(JobAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDto> handleClientAlreadyExistsException(JobAlreadyExistsException exception, WebRequest webRequest){
+
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(webRequest.getDescription(false),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                LocalDateTime.now());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(errorResponseDto);
+    }
+
+    @ExceptionHandler(BusinessRuleViolationException.class)
+    public ResponseEntity<ErrorResponseDto> handleClientAlreadyExistsException(BusinessRuleViolationException exception, WebRequest webRequest){
 
         ErrorResponseDto errorResponseDto = new ErrorResponseDto(webRequest.getDescription(false),
                 HttpStatus.BAD_REQUEST,

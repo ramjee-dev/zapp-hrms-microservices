@@ -1,7 +1,7 @@
 package com.zapp.candidate_service.service.impl;
 
 import com.zapp.candidate_service.dto.CandidateAddedEvent;
-import com.zapp.candidate_service.dto.CandidateDTO;
+import com.zapp.candidate_service.dto.CandidateDto;
 import com.zapp.candidate_service.dto.CandidateFilter;
 import com.zapp.candidate_service.dto.CandidateStatusChangedEvent;
 import com.zapp.candidate_service.entity.Candidate;
@@ -9,9 +9,12 @@ import com.zapp.candidate_service.exception.ResourceNotFoundException;
 import com.zapp.candidate_service.mapper.CandidateMapper;
 import com.zapp.candidate_service.repository.CandidateRepository;
 import com.zapp.candidate_service.service.ICandidateService;
+import com.zapp.candidate_service.service.client.JobServiceFeignClient;
+import feign.FeignException;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.errors.DuplicateResourceException;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,20 +29,43 @@ import java.util.*;
 public class CandidateServiceImpl implements ICandidateService {
 
     private final CandidateRepository candidateRepository;
+    private final JobServiceFeignClient jobServiceFeignClient;
     private final CandidateMapper candidateMapper;
     private final StreamBridge streamBridge;
 
+    /**
+     * @param jobId - Input JobId
+     * @param dto - Input CandidateDto object
+     */
     @Override
-    public Candidate addCandidateToJob(Long jobId, CandidateDTO dto) {
-        Candidate candidate = candidateMapper.toEntity(dto);
+    public void addCandidateToJob(Long jobId, CandidateDto dto) {
+
+        // 1. Validate that the job exists (via job-service)
+        try {
+            jobServiceFeignClient.getJobById(jobId);
+        } catch (FeignException.NotFound ex) {
+            throw new ResourceNotFoundException("Job", "jobId", jobId+"");
+        }
+
+        // Check for duplicate candidate for the same job
+        if (candidateRepository.existsByJobIdAndEmailIgnoreCase(jobId, dto.getEmail())) {
+            throw new DuplicateResourceException("Candidate with email already exists for this job");
+        }
+
+        // 2. Map DTO to entity
+        Candidate candidate = CandidateMapper.mapToCandidate(dto, new Candidate());
         candidate.setJobId(jobId);
         candidate.setStatus(Candidate.Status.APPLIED);
+
+        // 3. Save the candidate to DB
         Candidate savedCandidate = candidateRepository.save(candidate);
-        sendCommunication(savedCandidate);
-        return savedCandidate;
+        log.info("Candidate [{}] saved for Job Id [{}]", savedCandidate.getCandidateId(), jobId);
+
+        // 4. Fire event for asynchronous communication (Kafka)
+        publishCandidateAddedEvent(savedCandidate);
     }
 
-    private void sendCommunication(Candidate candidate) {
+    private void publishCandidateAddedEvent(Candidate candidate) {
         CandidateAddedEvent event = new CandidateAddedEvent(
                 candidate.getCandidateId(),
                 candidate.getFullName(),
@@ -51,7 +77,7 @@ public class CandidateServiceImpl implements ICandidateService {
         );
         log.info("Sending CandidateAddedEvent: {}", event);
         boolean sent = streamBridge.send("sendCommunication-out-0", event);
-        log.info("CandidateAddedEvent sent? {}", sent);
+        log.info("Is the communication request successfully triggered ? : {}",sent);
     }
 
     @Override
@@ -61,14 +87,15 @@ public class CandidateServiceImpl implements ICandidateService {
     }
 
     @Override
-    public Candidate getCandidateById(Long id) {
-        return candidateRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Candidate not found with id " + id));
+    public CandidateDto getCandidateById(Long candidateId) {
+         candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate","CandidateId",candidateId+""));
     }
 
     @Override
-    public Candidate updateCandidate(Long id, CandidateDTO dto) {
-        Candidate existing = getCandidateById(id);
+    public CandidateDto updateCandidate(Long id, CandidateDto dto) {
+
+        CandidateDto existing = getCandidateById(id);
         existing.setFullName(dto.getFullName());
         existing.setEmail(dto.getEmail());
         existing.setPhone(dto.getPhone());
@@ -126,10 +153,11 @@ public class CandidateServiceImpl implements ICandidateService {
     }
 
     @Override
-    public boolean updateCommunicationStatus(Long id) {
+    public boolean updateCommunicationStatus(Long candidateId) {
         boolean isUpdated = false;
-        if(id!=null){
-            Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Candidate not found with given ID: " + id));
+        if(candidateId!=null){
+            Candidate candidate = candidateRepository.findById(candidateId).orElseThrow(
+                    () -> new ResourceNotFoundException("Candidate","CandidateId",candidateId+""));
             candidate.setCommunicationSw(true);
             candidateRepository.save(candidate);
             isUpdated = true;

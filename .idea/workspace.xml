@@ -6,42 +6,32 @@
   <component name="ChangeListManager">
     <list default="true" id="a03bcff3-eb89-4fa4-abcb-6c4678f153c8" name="Changes" comment="implemented User-service APIs">
       <change beforePath="$PROJECT_DIR$/candidate-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/entity/Candidate.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/entity/Candidate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/CandidateServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/CandidateServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/controller/CandidateController.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/controller/CandidateController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/CandidateDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/CandidateDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/ResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/ResponseDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/exception/ResourceNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/exception/ResourceNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/mapper/CandidateMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/mapper/CandidateMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/repository/CandidateRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/repository/CandidateRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/ICandidateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/ICandidateService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/impl/CandidateServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/impl/CandidateServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/ClientServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/ClientServiceApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/controller/ClientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/controller/ClientController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/entity/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/entity/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/IClientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/IClientService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/impl/ClientServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/impl/ClientServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eureka-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/eureka-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/GlobalExceptionHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gateway-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gateway-service/src/main/java/com/zapp/gateway_service/GatewayServiceApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-service/src/main/java/com/zapp/gateway_service/GatewayServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-service/src/main/java/com/zapp/gateway_service/GatewayServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-service/src/main/java/com/zapp/gateway_service/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-service/src/main/java/com/zapp/gateway_service/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gateway-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/gateway-service/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/job-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/JobServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/JobServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/constants/JobsConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/constants/JobsConstants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/controller/JobController.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/controller/JobController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/ClientDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/ClientDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/JobRequestDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/JobResponseDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/entity/Job.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/entity/Job.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/ResourceNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/ResourceNotFoundException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/mapper/JobMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/mapper/JobMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/repository/JobRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/repository/JobRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobService.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/client/ClientServiceFeignClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/client/ClientServiceFeignClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/impl/JobServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/impl/JobServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/message-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/message-service/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/zapp/user_service/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/zapp/user_service/entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/zapp/user_service/mapper/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/zapp/user_service/mapper/UserMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zapp-bom/common/src/main/java/com/ramjee/commom/dto/ErrorResponseDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/zapp-bom/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/zapp-bom/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/zapp-bom/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/zapp/user_service/UserServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/zapp/user_service/UserServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/zapp/user_service/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/zapp/user_service/controller/UserController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,37 +74,63 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.CandidateServiceApplication.executor": "Debug",
-    "Application.ClientServiceApplication.executor": "Debug",
-    "Application.EurekaServiceApplication.executor": "Debug",
-    "Application.GatewayServiceApplication.executor": "Debug",
-    "Application.JobServiceApplication.executor": "Debug",
-    "Application.MessageServiceApplication.executor": "Debug",
-    "Application.UserServiceApplication.executor": "Debug",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "com.intellij.ide.FileNotInSourceRootChecker.no.check": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/nanir/OneDrive/Desktop/Java Backend Developer/Project/zapp-hrms",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.CandidateServiceApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.ClientServiceApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.EurekaServiceApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.GatewayServiceApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.JobServiceApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.MessageServiceApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.UserServiceApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ide.FileNotInSourceRootChecker.no.check&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/nanir/OneDrive/Desktop/Java Backend Developer/Project/zapp-hrms&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\nanir\OneDrive\Desktop\Java Backend Developer\Project\zapp-hrms\gateway-service\src\main\java\com\zapp\gateway_service" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.GatewayServiceApplication">
+  <component name="RunManager" selected="Application.CandidateServiceApplication">
     <configuration name="CandidateServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.zapp.candidate_service.CandidateServiceApplication" />
       <module name="candidate-service" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.zapp.candidate_service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ClientServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.zapp.client_service.ClientServiceApplication" />
+      <module name="client-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.zapp.client_service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EurekaServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.zapp.eureka_service.EurekaServiceApplication" />
+      <module name="eureka-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.zapp.eureka_service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -148,39 +164,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MessageServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.zapp.message_service.MessageServiceApplication" />
-      <module name="message-service" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.zapp.message_service.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="UserServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.zapp.user_service.UserServiceApplication" />
-      <module name="user-service" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.zapp.user_service.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.GatewayServiceApplication" />
-        <item itemvalue="Application.MessageServiceApplication" />
-        <item itemvalue="Application.UserServiceApplication" />
         <item itemvalue="Application.CandidateServiceApplication" />
         <item itemvalue="Application.JobServiceApplication" />
+        <item itemvalue="Application.ClientServiceApplication" />
+        <item itemvalue="Application.EurekaServiceApplication" />
+        <item itemvalue="Application.GatewayServiceApplication" />
       </list>
     </recent_temporary>
   </component>

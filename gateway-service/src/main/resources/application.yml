@@ -65,3 +65,16 @@ info:
     name: "gateway-service"
     description: "Zapp-Hrms Gateway server application"
     version: "1.0.0"
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: CLIENT-SERVICE
+        url: /zapphrms/client-service/v3/api-docs
+      - name: JOB-SERVICE
+        url: /zapphrms/job-service/v3/api-docs
+      - name: CANDIDATE-SERVICE
+        url: /zapphrms/candidate-service/v3/api-docs
+      - name: USER-SERVICE
+        url: /zapphrms/user-service/v3/api-docs
+

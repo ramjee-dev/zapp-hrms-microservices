@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient("client-service")
 public interface ClientServiceFeignClient {
 
-    @GetMapping(value = "/clients/{id}", consumes = "application/json")
-    ResponseEntity<ClientDto> getClientById(@PathVariable("id") Long id);
+    @GetMapping(value = "/clients/{candidateId}", consumes = "application/json")
+    ResponseEntity<ClientDto> getClientById(@PathVariable("candidateId") Long candidateId);
 }
 

@@ -1,18 +1,24 @@
 package com.zapp.candidate_service.mapper;
 
-import com.zapp.candidate_service.dto.CandidateDTO;
+import com.zapp.candidate_service.dto.CandidateDto;
 import com.zapp.candidate_service.entity.Candidate;
-import org.springframework.stereotype.Component;
 
-@Component
 public class CandidateMapper {
 
-    public Candidate toEntity(CandidateDTO dto) {
-        return Candidate.builder()
-                .fullName(dto.getFullName())
-                .email(dto.getEmail())
-                .phone(dto.getPhone())
-                .remarks(dto.getRemarks())
-                .build();
+    public static CandidateDto mapToCandidateDto(Candidate candidate, CandidateDto candidateDto) {
+        candidateDto.setFullName(candidate.getFullName());
+        candidateDto.setEmail(candidate.getEmail());
+        candidateDto.setPhone(candidate.getPhone());
+        candidateDto.setRemarks(candidate.getRemarks());
+        return candidateDto;
+    }
+
+    public static Candidate mapToCandidate(CandidateDto dto, Candidate candidate) {
+        candidate.setFullName(dto.getFullName());
+        candidate.setEmail(dto.getEmail());
+        candidate.setPhone(dto.getPhone());
+        candidate.setRemarks(dto.getRemarks());
+        return candidate;
     }
 }
+

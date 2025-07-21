@@ -50,7 +50,8 @@ public class JobServiceImpl implements IJobService {
         }
 
         Job job = JobMapper.mapToJob(dto, new Job());
-        jobRepository.save(job);
+        Job savedJob = jobRepository.save(job);
+        sendCommunication(savedJob);
 
 
     }

@@ -22,13 +22,17 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity){
 
-       return serverHttpSecurity.authorizeExchange(exchanges-> exchanges
+       return serverHttpSecurity.authorizeExchange(
+               exchanges-> exchanges
                 .pathMatchers(HttpMethod.GET).permitAll()
                 .pathMatchers("/zapphrms/client-service/**").hasRole("CLIENTS")
                 .pathMatchers("/zapphrms/job-service/**").hasRole("JOBS")
                 .pathMatchers("/zapphrms/candidate-service/**").hasRole("CANDIDATES"))
-                .oauth2ResourceServer(specs->specs
-                        .jwt(jwtSpecs->jwtSpecs.jwtAuthenticationConverter(grantedAuthoritiesExtractor())))
+                .oauth2ResourceServer(
+                        specs->specs
+                        .jwt(
+                                jwtSpecs->jwtSpecs
+                                        .jwtAuthenticationConverter(grantedAuthoritiesExtractor())))
                .csrf(specs->specs.disable()).build();
 
     }
@@ -36,7 +40,7 @@ public class SecurityConfig {
     private Converter<Jwt, Mono<AbstractAuthenticationToken>> grantedAuthoritiesExtractor(){
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new com.zapp.gateway_service.config.KeycloakRoleConverter());
         return new ReactiveJwtAuthenticationConverterAdapter(jwtAuthenticationConverter);
     }
 }

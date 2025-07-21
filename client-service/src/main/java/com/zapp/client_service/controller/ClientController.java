@@ -1,8 +1,8 @@
 package com.zapp.client_service.controller;
 
-import com.ramjee.common.dto.ErrorResponseDto;
 import com.zapp.client_service.constants.ClientsConstants;
 import  com.zapp.client_service.dto.ClientDto;
+import com.zapp.client_service.dto.ErrorResponseDto;
 import com.zapp.client_service.dto.ResponseDto;
 import com.zapp.client_service.service.IClientService;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -32,8 +32,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Slf4j
-@Tag(name = "CRUD REST APIs for Clients in EazyBank",
-        description = "CRUD REST APIs in ZappHrms to CREATE , UPDATE , FETCH , DELETE Client Details")
+@Tag(name = "CRUD REST APIs for Clients in ZappHRMS",
+        description = "CRUD REST APIs in ZappHRMS to CREATE , UPDATE , FETCH , DELETE Client Details")
 public class ClientController {
 
     private final IClientService service;
@@ -91,7 +91,7 @@ public class ClientController {
             )
     })
     @GetMapping("/fetch/{clientId}")
-    public ResponseEntity<ClientDto> fetchClientDetails(@PathVariable Long clientId) {
+    public ResponseEntity<ClientDto> fetchClientDetails(@PathVariable("clientId") Long clientId) {
         ClientDto clientDto = service.fetchClientById(clientId);
         return ResponseEntity
                 .status(HttpStatus.OK)

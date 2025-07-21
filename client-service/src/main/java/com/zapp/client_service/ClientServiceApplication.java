@@ -19,15 +19,15 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 				contact = @Contact(
 						name = "Ramjee",
 						email = "ramjeedev.tech@gmail.com",
-						url = ""
+						url = "github.com/ramjee-dev"
 				),license = @License(
 						name = "Apache 2.0",
-				url = ""
+				url = "github.com/ramjee-dev"
 		)
 		),
 		externalDocs =@ExternalDocumentation(
 				description = "Zapp Hrms Client microservice REST API Documentation",
-				url = ""
+				url = "github.com/ramjee-dev"
 		)
 )
 public class ClientServiceApplication {
