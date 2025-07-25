@@ -1,77 +1,127 @@
 package com.zapp.client_service.exception;
 
-
 import com.zapp.client_service.dto.ErrorResponseDto;
-import org.springframework.http.HttpHeaders;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
-    @ExceptionHandler(ClientAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponseDto> handleClientAlreadyExistsException(ClientAlreadyExistsException exception, WebRequest webRequest){
-
-        ErrorResponseDto errorResponseDto = new ErrorResponseDto(webRequest.getDescription(false),
-                HttpStatus.BAD_REQUEST,
-                exception.getMessage(),
-                LocalDateTime.now());
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(errorResponseDto);
-    }
+@RestControllerAdvice
+@Slf4j
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleResourceNotFoundException(ResourceNotFoundException exception, WebRequest webRequest){
-
-        ErrorResponseDto errorResponseDto = new ErrorResponseDto(webRequest.getDescription(false),
+    public ResponseEntity<ErrorResponseDto> handleClientNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+        log.warn("Client not found: clientId='{}', path='{}'", ex.getFieldValue(), request.getRequestURI());
+        return buildErrorResponse(
+                request.getRequestURI(),
                 HttpStatus.NOT_FOUND,
-                exception.getMessage(),
-                LocalDateTime.now());
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(errorResponseDto);
+                "Not Found",
+                ex.getMessage(),
+                null
+        );
+    }
+
+    @ExceptionHandler(ClientAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDto> handleClientAlreadyExists(ClientAlreadyExistsException ex, HttpServletRequest request) {
+        log.warn("Client already exists: clientName='{}', path='{}'", ex.getClientName(), request.getRequestURI());
+        return buildErrorResponse(
+                request.getRequestURI(),
+                HttpStatus.CONFLICT,
+                "Conflict",
+                ex.getMessage(),
+                null
+        );
+    }
+
+    @ExceptionHandler(BusinessValidationException.class)
+    public ResponseEntity<ErrorResponseDto> handleBusinessValidation(BusinessValidationException ex, HttpServletRequest request) {
+        log.warn("Business validation failed: field='{}', rejectedValue='{}', path='{}'",
+                ex.getField(), ex.getRejectedValue(), request.getRequestURI());
+        Map<String, Object> details = new HashMap<>();
+        details.put("field", ex.getField());
+        details.put("rejectedValue", ex.getRejectedValue());
+        return buildErrorResponse(
+                request.getRequestURI(),
+                HttpStatus.BAD_REQUEST,
+                "Bad Request",
+                ex.getMessage(),
+                details
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        log.warn("Validation failed for request to path='{}'", request.getRequestURI());
+
+        Map<String, String> errors = new LinkedHashMap<>();
+        for (var error : ex.getBindingResult().getAllErrors()) {
+            String fieldName = error instanceof FieldError ? ((FieldError) error).getField() : error.getObjectName();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        }
+        return buildErrorResponse(
+                request.getRequestURI(),
+                HttpStatus.BAD_REQUEST,
+                "Bad Request",
+                "Validation failed",
+                errors
+        );
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponseDto> handleConstraintViolation(ConstraintViolationException ex, HttpServletRequest request) {
+        log.warn("Constraint violation for request to path='{}'", request.getRequestURI());
+
+        Map<String, String> errors = new LinkedHashMap<>();
+        ex.getConstraintViolations().forEach(violation -> {
+            String field = violation.getPropertyPath().toString();
+            String message = violation.getMessage();
+            errors.put(field, message);
+        });
+        return buildErrorResponse(
+                request.getRequestURI(),
+                HttpStatus.BAD_REQUEST,
+                "Bad Request",
+                "Validation failed",
+                errors
+        );
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception exception, WebRequest webRequest){
-
-        ErrorResponseDto errorResponseDto = new ErrorResponseDto(webRequest.getDescription(false),
+    public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception ex, HttpServletRequest request) {
+        log.error("Unexpected error occurred for request to path='{}'", request.getRequestURI(), ex);
+        return buildErrorResponse(
+                request.getRequestURI(),
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                exception.getMessage(),
-                LocalDateTime.now());
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(errorResponseDto);
+                "Internal Server Error",
+                ex.getMessage(),
+                null
+        );
     }
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        Map<String,String> validationErrors = new HashMap<>();
-        List<ObjectError> validationErrorList = ex.getBindingResult().getAllErrors();
-
-        validationErrorList.forEach((error)->{
-            String fieldName = ((FieldError) error).getField();
-            String validationMsg = error.getDefaultMessage();
-            validationErrors.put(fieldName,validationMsg);
-        });
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(validationErrors);
+    // Utility method to reduce duplication
+    private ResponseEntity<ErrorResponseDto> buildErrorResponse(
+            String path, HttpStatus status, String error, String message, Object details) {
+        return ResponseEntity.status(status).body(
+                ErrorResponseDto.builder()
+                        .path(path)
+                        .status(status.value())
+                        .error(error)
+                        .message(message)
+                        .timestamp(LocalDateTime.now())
+                        .details(details)
+                        .build()
+        );
     }
-
-
 }

@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 )
 public class ClientDto {
 
+    private long clientId;
+
     @Schema(description = "Name of the Client",example = "Facebook")
     @NotBlank(message = "Client name cannot be null or blank")
     @Size(min = 4, max = 30, message = "Client name must be between 4 and 30 characters")
