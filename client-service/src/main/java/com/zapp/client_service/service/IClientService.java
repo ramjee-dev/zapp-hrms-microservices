@@ -2,24 +2,24 @@ package com.zapp.client_service.service;
 
 import com.zapp.client_service.dto.*;
 import com.zapp.client_service.entity.Client;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.zapp.client_service.enums.ClientStatus;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IClientService {
 
-    ClientResponseDto createClient(ClientCreateRequestDto dto);
+    ClientResponseDto createClient(CreateClientRequestDto dto);
 
-    ClientResponseDto fetchClientById(Long clientId);
+    ClientResponseDto fetchClientById(UUID clientId);
 
-    ClientPageResponseDto getAllClients(ClientPageRequestDto dto);
+    PagedClientResponseDto fetchAllClients(ClientPageRequestDto dto);
 
-    List<ClientResponseDto> getClientByStatus(Client.Status status);
+    ClientResponseDto updateClient(UUID clientId, UpdateClientRequestDto clientDto);
 
-    ClientResponseDto updateClient(Long clientId, ClientUpdateRequestDto clientDto);
+    ClientResponseDto partialUpdateClient(UUID clientId, PartialUpdateClientRequestDto clientDto);
 
-    ClientResponseDto partialUpdateClient(Long clientId, ClientPartialUpdateRequestDto clientDto);
+    ClientResponseDto changeClientStatus(UUID clientId, ClientStatus newStatus);
 
-    void deleteClient(Long clientId);
+    void deleteClient(UUID clientId);
 }

@@ -1,11 +1,9 @@
 package com.zapp.job_service.service.impl;
 
-import com.zapp.job_service.dto.CreateJobDto;
-import com.zapp.job_service.dto.UpdateJobDto;
+import com.zapp.job_service.dto.CreateJobRequestDto;
+import com.zapp.job_service.dto.UpdateJobRequestDto;
 import com.zapp.job_service.entity.Job;
 import com.zapp.job_service.enums.JobStatus;
-import com.zapp.job_service.exception.BusinessRuleViolationException;
-import com.zapp.job_service.exception.JobAlreadyExistsException;
 import com.zapp.job_service.exception.JobValidationException;
 import com.zapp.job_service.service.IJobValidationService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -21,7 +18,7 @@ import java.util.UUID;
 public class JobValidationServiceImpl implements IJobValidationService {
 
     @Override
-    public void validateCreateJob(CreateJobDto dto) {
+    public void validateCreateJobRequest(CreateJobRequestDto dto) {
 
         log.debug("Validating job creation for client: {}", dto.clientId());
 
@@ -44,14 +41,14 @@ public class JobValidationServiceImpl implements IJobValidationService {
     }
 
     @Override
-    public void validateUpdateJob(UUID jobId, UpdateJobDto updateJobDto) {
+    public void validateUpdateJobRequest(UUID jobId, UpdateJobRequestDto updateJobRequestDto) {
 
         log.debug("Validating job update for job: {}", jobId);
 
         List<String> errors = new ArrayList<>();
 
         // Business validation rules for update
-        if (updateJobDto.positionsAvailable() != null && updateJobDto.positionsAvailable() <= 0) {
+        if (updateJobRequestDto.positionsAvailable() != null && updateJobRequestDto.positionsAvailable() <= 0) {
             errors.add("Positions available must be greater than 0");
         }
 

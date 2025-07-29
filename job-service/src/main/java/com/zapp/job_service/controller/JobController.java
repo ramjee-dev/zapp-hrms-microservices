@@ -44,11 +44,11 @@ public class JobController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
     public ResponseEntity<JobResponseDto> createJob(
-            @Valid @RequestBody CreateJobDto createJobDto) {
+            @Valid @RequestBody CreateJobRequestDto createJobRequestDto) {
 
-        log.info("Received request to create job for client: {}", createJobDto.clientId());
+        log.info("Received request to create job for client: {}", createJobRequestDto.clientId());
 
-        JobResponseDto createdJob = jobService.createJob(createJobDto);
+        JobResponseDto createdJob = jobService.createJob(createJobRequestDto);
 
         URI location = URI.create("/api/v1/jobs/" + createdJob.id());
 
@@ -106,18 +106,18 @@ public class JobController {
     })
     public ResponseEntity<JobResponseDto> updateJob(
             @Parameter(description = "Job ID") @PathVariable("id") UUID jobId,
-            @Valid @RequestBody UpdateJobDto updateJobDto) {
+            @Valid @RequestBody UpdateJobRequestDto updateJobRequestDto) {
 
         log.info("Received request to update job with id: {}", jobId);
 
-        JobResponseDto updatedJob = jobService.updateJob(jobId, updateJobDto);
+        JobResponseDto updatedJob = jobService.updateJob(jobId, updateJobRequestDto);
         return ResponseEntity.ok(updatedJob);
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "Partially update job", description = "Updates specific fields of an existing job")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Job updated successfully",
+            @ApiResponse(responseCode = "200", description = "Job Partially updated successfully",
                     content = @Content(schema = @Schema(implementation = JobResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Job not found",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
@@ -126,11 +126,11 @@ public class JobController {
     })
     public ResponseEntity<JobResponseDto> partialUpdateJob(
             @Parameter(description = "Job ID") @PathVariable UUID id,
-            @Valid @RequestBody PartialUpdateJobDto partialUpdateJobDto) {
+            @Valid @RequestBody PartialUpdateJobRequestDto partialUpdateJobRequestDto) {
 
         log.info("Received request to partially update job with id: {}", id);
 
-        JobResponseDto updatedJob = jobService.partialUpdateJob(id, partialUpdateJobDto);
+        JobResponseDto updatedJob = jobService.partialUpdateJob(id, partialUpdateJobRequestDto);
         return ResponseEntity.ok(updatedJob);
     }
 
@@ -151,7 +151,7 @@ public class JobController {
             @Parameter(description = "Job ID") @PathVariable UUID jobId,
             @Parameter(description = "New job status") @RequestParam JobStatus status) {
 
-        log.info("Received request to change status of job {} to {}", id, status);
+        log.info("Received request to change status of job {} to {}", jobId, status);
 
         JobResponseDto updatedJob = jobService.changeJobStatus(jobId, status);
         return ResponseEntity.ok(updatedJob);
@@ -168,11 +168,11 @@ public class JobController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
     public ResponseEntity<Void> deleteJob(
-            @Parameter(description = "Job ID") @PathVariable UUID id) {
+            @Parameter(description = "Job ID") @PathVariable("id") UUID clientId) {
 
-        log.info("Received request to delete job with id: {}", id);
+        log.info("Received request to delete job with id: {}", clientId);
 
-        jobService.deleteJob(id);
+        jobService.deleteJob(clientId);
         return ResponseEntity.noContent().build();
     }
 }

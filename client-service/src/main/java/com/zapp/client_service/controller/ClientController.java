@@ -3,8 +3,10 @@ package com.zapp.client_service.controller;
 import com.zapp.client_service.constants.ClientsConstants;
 import com.zapp.client_service.dto.*;
 import com.zapp.client_service.entity.Client;
+import com.zapp.client_service.enums.ClientStatus;
 import com.zapp.client_service.service.IClientService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,8 +18,10 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,314 +29,165 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/clients", produces = MediaType.APPLICATION_JSON_VALUE)
-@RequiredArgsConstructor
-@Validated
-@Slf4j
+@RequiredArgsConstructor@Validated@Slf4j
 @Tag(name = "Client Management",description = "APIs for managing ZAPP HRMS Clients")
 public class ClientController {
 
-    private final IClientService service;
+    private final IClientService clientService;
 
-    @Operation(summary = "Create a new client",description = "Creates a new client with the provided details")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Client created successfully",
-                    content = @Content(schema = @Schema(implementation = ResponseDto.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
-            ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "Client already exists",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal server error",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
-            )
-    })
     @PostMapping
-    public ResponseEntity<ResponseDto> createClient(@Valid @RequestBody ClientCreateRequestDto dto,
-                                                    HttpServletRequest request) {
-        log.info("Received request to create client: name='{}', requestId='{}'",
-                dto.getName(), request.getHeader("X-Request-ID"));
+//    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Create a new client", description = "Creates a new client (Admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Client created successfully",
+                    content = @Content(schema = @Schema(implementation = ClientResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid client data",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+    })
+    public ResponseEntity<ClientResponseDto> createClient(
+            @Valid @RequestBody CreateClientRequestDto createClientDto) {
 
-        ClientResponseDto createdClient = service.createClient(dto);
+        log.info("Received request to create client: {}", createClientDto.companyName());
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{clientId}")
-                .buildAndExpand(createdClient.getClientId())
-                .toUri();
+        ClientResponseDto createdClient = clientService.createClient(createClientDto);
 
-        ResponseDto response = new ResponseDto(
-                ClientsConstants.STATUS_201,
-                ClientsConstants.MESSAGE_201,
-                createdClient);
-
-        log.info("Successfully created client: id={}, name='{}', requestId='{}'",createdClient.getClientId(),
-                createdClient.getName(),request.getHeader("X-Request-ID"));
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+        URI location = URI.create("/api/v1/clients/" + createdClient.id());
+        return ResponseEntity.created(location).body(createdClient);
     }
 
-//    @Retry(name = "getAllClients",fallbackMethod = "getAllClientsFallback")
-//    @GetMapping
-//    public Page<ClientDto> getAll(Pageable pageable) {
-//        log.debug("getALLClients API invoked");
-//        return service.getAllClients(pageable);
-//    }
-
-//    public Page<ClientDto> getAllClientsFallback(Pageable pageable, Throwable throwable) {
-//        log.error("Fallback triggered for getAllClients due to: {}", throwable.getMessage());
-//
-//        List<ClientDto> fallbackList = Collections.emptyList(); // or pre-defined backup list
-//        return new PageImpl<>(fallbackList, pageable, 0);
-//    }
-
-    @Operation(summary = "Get Client by ID",description = "Retrieves a client by their unique identifier")
+    @GetMapping("/{id}")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'BD', 'TAT')")
+    @Operation(summary = "Get client by ID", description = "Retrieves a specific client by its ID")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Client retrieved successfully" ,
-                    content = @Content(schema = @Schema(implementation = ResponseDto.class))
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Client not found" ,
-                    content =@Content(schema = @Schema(implementation = ErrorResponseDto.class))),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal server error",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
-            )
+            @ApiResponse(responseCode = "200", description = "Client found",
+                    content = @Content(schema = @Schema(implementation = ClientResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Client not found",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
-    @GetMapping("/{clientId}")
-    public ResponseEntity<ResponseDto> fetchClientDetails(@PathVariable("clientId") @Min(value = 1,
-            message = "Client ID must be positive") Long clientId , HttpServletRequest request) {
+    public ResponseEntity<ClientResponseDto> getClientById(
+            @Parameter(description = "Client ID") @PathVariable UUID id) {
 
-        log.info("Received request to get client: id={}, requestId='{}'",
-                clientId, request.getHeader("X-Request-ID"));
+        log.debug("Received request to get client with id: {}", id);
 
-        ClientResponseDto clientDto = service.fetchClientById(clientId);
-
-        ResponseDto response = new ResponseDto(
-                ClientsConstants.STATUS_200,
-                ClientsConstants.MESSAGE_200,
-                clientDto);
-
-        log.info("Successfully retrieved client: id={}, name='{}', requestId='{}'",
-                clientDto.getClientId(), clientDto.getName(), request.getHeader("X-Request-ID"));
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(response);
+        ClientResponseDto client = clientService.fetchClientById(id);
+        return ResponseEntity.ok(client);
     }
 
     @GetMapping
-    @Operation(summary = "Get all clients", description = "Retrieves a paginated list of clients with optional filtering")
+//    @PreAuthorize("hasAnyRole('ADMIN', 'BD', 'TAT')")
+    @Operation(summary = "Get all Clients with pagination and filtering",
+            description = "Retrieves all Clients with support for pagination, sorting, and filtering")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Clients retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid pagination or filter parameters"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "200", description = "Clients retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = PagedClientResponseDto.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
-    public ResponseEntity<ResponseDto> getAllClients(@Valid ClientPageRequestDto dto , HttpServletRequest request){
+    public ResponseEntity<PagedClientResponseDto> getAllClients(
+            @Valid @ParameterObject
+            @ModelAttribute ClientPageRequestDto requestDto) {
 
-        log.info("Received request to get all clients: page={}, size={}, requestId='{}'",
-                dto.getPage(), dto.getSize(), request.getHeader("X-Request-ID"));
+        log.debug("Received request to get all clients with filters: {}", requestDto);
 
-        ClientPageResponseDto clients = service.getAllClients(dto);
-
-        ResponseDto response = new ResponseDto(
-                ClientsConstants.STATUS_200,
-                ClientsConstants.MESSAGE_200,
-                clients);
-
-        log.info("Successfully retrieved {} clients, requestId='{}'",
-                clients.getContent().size(), request.getHeader("X-Request-ID"));
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(response);
-
+        PagedClientResponseDto response = clientService.fetchAllClients(requestDto);
+        return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get clients by status", description = "Retrieves clients filtered by their status")
+    @PutMapping("/{id}")
+//    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update client", description = "Updates an existing client completely (Admin only)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Clients retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid status parameter"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "200", description = "Client updated successfully",
+                    content = @Content(schema = @Schema(implementation = ClientResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Client not found",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid Client data",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
-    @GetMapping("/status/{status}")
-    public ResponseEntity<ResponseDto> getClientsByStatus(
-            @PathVariable @Pattern(regexp = "^(ACTIVE|INACTIVE)$", message = "Status must be ACTIVE or INACTIVE") String status,
-            HttpServletRequest request) {
+    public ResponseEntity<ClientResponseDto> updateClient(
+            @Parameter(description = "Client ID") @PathVariable("id") UUID clientId,
+            @Valid @RequestBody UpdateClientRequestDto updateClientDto) {
 
-        log.info("Received request to get clients by status: status={}, requestId='{}'",
-                status, request.getHeader("X-Request-ID"));
+        log.info("Received request to update client with id: {}", clientId);
 
-        List<ClientResponseDto> clients = service.getClientByStatus(Client.Status.valueOf(status));
-
-        ResponseDto response = new ResponseDto(
-                ClientsConstants.STATUS_200,
-                ClientsConstants.MESSAGE_200,
-                clients);
-
-        log.info("Successfully retrieved {} clients with status={}, requestId='{}'",
-                clients.size(), status, request.getHeader("X-Request-ID"));
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(response);
+        ClientResponseDto updatedClient = clientService.updateClient(clientId, updateClientDto);
+        return ResponseEntity.ok(updatedClient);
     }
 
-    @Operation(summary = "Update Client",description = "Updates all fields of an existing client")
+    @PatchMapping("/{id}")
+//    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Partially Update client", description = "Updates specific fields of an existing Client")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Client Updated successfully",
-                    content = @Content(schema = @Schema(implementation = ResponseDto.class))
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Client not found" ,
-                    content =@Content(schema = @Schema(implementation = ErrorResponseDto.class))),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
-            ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "Client already exists",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal server error",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
-            )
+            @ApiResponse(responseCode = "200", description = "Client Partially updated successfully",
+                    content = @Content(schema = @Schema(implementation = ClientResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Client not found",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid Client data",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
-    @PutMapping("/{clientId}")
-    public ResponseEntity<ResponseDto> updateClientDetails(
-            @PathVariable("clientId") @Min(value = 1,message = "Client ID must be positive") Long clientId,
-            @Valid @RequestBody ClientUpdateRequestDto clientDto,HttpServletRequest request) {
+    public ResponseEntity<ClientResponseDto> partiallyUpdateClient(
+            @Parameter(description = "Client ID") @PathVariable("id") UUID clientId,
+            @Valid @RequestBody PartialUpdateClientRequestDto updateClientDto) {
 
-        log.info("Received request to update client: id={}, name='{}', requestId='{}'",
-                clientId, clientDto.getName(), request.getHeader("X-Request-ID"));
+        log.info("Received request to partially update client with id: {}", clientId);
 
-        ClientResponseDto updatedClient = service.updateClient(clientId, clientDto);
-
-        ResponseDto response = new ResponseDto(
-                ClientsConstants.STATUS_200,
-                ClientsConstants.MESSAGE_200_UPDATE,
-                updatedClient);
-
-        log.info("Successfully updated client: id={}, name='{}', requestId='{}'",
-                updatedClient.getClientId(), updatedClient.getName(), request.getHeader("X-Request-ID"));
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(response);
-            }
-
-    @Operation(summary = "Partially update client",description = "Updates specific fields of an existing client")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Client Partially Updated successfully",
-                    content = @Content(schema = @Schema(implementation = ResponseDto.class))
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Client not found" ,
-                    content =@Content(schema = @Schema(implementation = ErrorResponseDto.class))),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid input data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
-            ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "Client already exists",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal server error",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
-            )
-    })
-    @PatchMapping("/{clientId}")
-    public ResponseEntity<ResponseDto> partialUpdateClientDetails(
-            @PathVariable("clientId") @Min(value = 1,message = "Client ID must be positive") Long clientId,
-            @Valid @RequestBody ClientPartialUpdateRequestDto clientDto,HttpServletRequest request) {
-
-        log.info("Received request to Partially update client: id={}, name='{}', requestId='{}'",
-                clientId, clientDto.getName(), request.getHeader("X-Request-ID"));
-
-        ClientResponseDto updatedClient = service.partialUpdateClient(clientId, clientDto);
-
-        ResponseDto response = new ResponseDto(
-                ClientsConstants.STATUS_200,
-                ClientsConstants.MESSAGE_200_UPDATE,
-                updatedClient);
-
-        log.info("Successfully Partially updated client: id={}, name='{}', requestId='{}'",
-                updatedClient.getClientId(), updatedClient.getName(), request.getHeader("X-Request-ID"));
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(response);
+        ClientResponseDto updatedClient = clientService.partialUpdateClient(clientId, updateClientDto);
+        return ResponseEntity.ok(updatedClient);
     }
 
-    @Operation(summary = "Delete client",description = "Removes a client from the system")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Client Deleted successfully",
-                    content = @Content(schema = @Schema(implementation = ResponseDto.class))
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Client not found" ,
-                    content =@Content(schema = @Schema(implementation = ErrorResponseDto.class))),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal server error",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
-            )
+    @PatchMapping("/{id}/status")
+//    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Change client status", description = "Changes the status of a client (Admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Client status changed successfully",
+                    content = @Content(schema = @Schema(implementation = ClientResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Client not found",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid status transition",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+
     })
-    @DeleteMapping("/{clientId}")
-    public ResponseEntity<ResponseDto> deleteClientDetails(
-            @PathVariable("clientId") @Min(value = 1,message = "Client ID must be positive")
-            Long clientId , HttpServletRequest request) {
+    public ResponseEntity<ClientResponseDto> changeClientStatus(
+            @Parameter(description = "Client ID") @PathVariable UUID id,
+            @Parameter(description = "New client status") @RequestParam ClientStatus status) {
 
-        log.info("Received request to delete client: id={}, requestId='{}'",
-                clientId, request.getHeader("X-Request-ID"));
+        log.info("Received request to change status of client {} to {}", id, status);
 
-        service.deleteClient(clientId);
+        ClientResponseDto updatedClient = clientService.changeClientStatus(id, status);
+        return ResponseEntity.ok(updatedClient);
+    }
 
-        ResponseDto response = new ResponseDto(
-                ClientsConstants.STATUS_204,
-                ClientsConstants.MESSAGE_204,
-                null);
+    @DeleteMapping("/{id}")
+//    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete client", description = "Deletes a client permanently (Admin only)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Client deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Client not found",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+    })
+    public ResponseEntity<Void> deleteClient(
+            @Parameter(description = "Client ID") @PathVariable("id") UUID clientId) {
 
-        log.info("Successfully deleted client: id={}, requestId='{}'",
-                clientId, request.getHeader("X-Request-ID"));
+        log.info("Received request to delete client with id: {}", clientId);
 
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .body(response);
+        clientService.deleteClient(clientId);
+        return ResponseEntity.noContent().build();
     }
 
 }

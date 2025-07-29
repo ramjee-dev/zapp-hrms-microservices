@@ -8,16 +8,14 @@ import java.util.List;
 
 public interface IClientMappingService {
 
-    Client toEntity(ClientCreateRequestDto dto);
+    Client toEntity(CreateClientRequestDto dto);
 
-    Client toEntity(ClientUpdateRequestDto dto);
+    void updateEntity(Client existingClient, UpdateClientRequestDto dto);
 
-    ClientResponseDto toResponseDto(Client entity);
+    void partialUpdateEntity(Client existingClient, PartialUpdateClientRequestDto dto);
 
-    List<ClientResponseDto> toResponseDtoList(List<Client> entities);
+    ClientResponseDto toResponseDto(Client client);
 
-    ClientPageResponseDto toPageResponseDto(Page<Client> page);
-
-    void mapPartialUpdate(ClientPartialUpdateRequestDto dto , Client existingClient);
+    List<ClientResponseDto> toResponseDtoList(List<Client> clientList);
 
 }

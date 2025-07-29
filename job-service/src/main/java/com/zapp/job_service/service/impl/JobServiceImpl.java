@@ -3,16 +3,12 @@ package com.zapp.job_service.service.impl;
 import com.zapp.job_service.dto.*;
 import com.zapp.job_service.entity.Job;
 import com.zapp.job_service.enums.JobStatus;
-import com.zapp.job_service.exception.BusinessRuleViolationException;
-import com.zapp.job_service.exception.JobAlreadyExistsException;
 import com.zapp.job_service.exception.ResourceNotFoundException;
-import com.zapp.job_service.mapper.JobMapper;
 import com.zapp.job_service.repository.JobRepository;
 import com.zapp.job_service.service.IJobMappingService;
 import com.zapp.job_service.service.IJobService;
 import com.zapp.job_service.service.IJobValidationService;
 import com.zapp.job_service.service.client.ClientServiceFeignClient;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -24,12 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
+@RequiredArgsConstructor@Slf4j
 @Transactional(readOnly = true)
 public class JobServiceImpl implements IJobService {
 
@@ -42,16 +36,16 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     @Transactional
-    public JobResponseDto createJob(CreateJobDto createJobDto) {
+    public JobResponseDto createJob(CreateJobRequestDto createJobRequestDto) {
 
-        log.info("Creating new job for client: {}", createJobDto.clientId());
+        log.info("Creating new job for client: {}", createJobRequestDto.clientId());
 
-        validationService.validateCreateJob(createJobDto);
+        validationService.validateCreateJobRequest(createJobRequestDto);
 
-        Job job = mappingService.toEntity(createJobDto);
+        Job job = mappingService.toEntity(createJobRequestDto);
         Job savedJob = jobRepository.save(job);
 
-        log.info("Successfully created job with id: {}", savedJob.getJobId());
+        log.info("Successfully created job with id: {}", savedJob.getId());
 
         sendCommunication(savedJob);
 
@@ -75,7 +69,7 @@ public class JobServiceImpl implements IJobService {
 
     private void sendCommunication(Job job){
 
-        JobCreatedEvent jobCreatedEvent = new JobCreatedEvent(job.getJobId(), job.getTitle(), job.getClientId()+"","anonymous",job.getCreatedAt()+"", Arrays.asList("ADMIN","DB"));
+        JobCreatedEvent jobCreatedEvent = new JobCreatedEvent(job.getId(), job.getTitle(), job.getClientId()+"","anonymous",job.getCreatedAt()+"", Arrays.asList("ADMIN","DB"));
         log.info("Sending communication request for the details: {}",jobCreatedEvent);
         boolean send = streamBridge.send("sendCommunication-out-0", jobCreatedEvent);
         log.info("Is the communication request successfully triggered ? : {}",send);
@@ -144,18 +138,18 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     @Transactional
-    public JobResponseDto updateJob(UUID jobId, UpdateJobDto updateJobDto) {
+    public JobResponseDto updateJob(UUID jobId, UpdateJobRequestDto updateJobRequestDto) {
 
         log.info("Updating job with id: {}", jobId);
 
-        validationService.validateUpdateJob(jobId,updateJobDto);
+        validationService.validateUpdateJobRequest(jobId, updateJobRequestDto);
 
         // if needed check for already exists exception
 
         Job existingJob = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job","JobId",jobId+""));
 
-        mappingService.updateEntity(existingJob,updateJobDto);
+        mappingService.updateEntity(existingJob, updateJobRequestDto);
 
         Job updatedJob = jobRepository.save(existingJob);
 
@@ -166,14 +160,14 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     @Transactional
-    public JobResponseDto partialUpdateJob(UUID jobId, PartialUpdateJobDto partialUpdateJobDto) {
+    public JobResponseDto partialUpdateJob(UUID jobId, PartialUpdateJobRequestDto partialUpdateJobRequestDto) {
 
         log.info("Partially updating job with id: {}", jobId);
 
         Job existingJob = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job","JobId",jobId+""));
 
-        mappingService.partialUpdateEntity(existingJob,partialUpdateJobDto);
+        mappingService.partialUpdateEntity(existingJob, partialUpdateJobRequestDto);
 
         Job updatedJob = jobRepository.save(existingJob);
 
@@ -220,17 +214,17 @@ public class JobServiceImpl implements IJobService {
         return false;
     }
 
-    @Override
-    public boolean updateCommunicationStatus(UUID jobId) {
-        boolean isUpdated = false;
-        if(jobId!=null){
-            Job job = jobRepository.findById(jobId).orElseThrow(() -> new ResourceNotFoundException("Job","jobId",jobId+""));
-            job.setCommunicationSw(true);
-            jobRepository.save(job);
-            isUpdated=true;
-        }
-        return isUpdated;
-    }
+//    @Override
+//    public boolean updateCommunicationStatus(UUID jobId) {
+//        boolean isUpdated = false;
+//        if(jobId!=null){
+//            Job job = jobRepository.findById(jobId).orElseThrow(() -> new ResourceNotFoundException("Job","jobId",jobId+""));
+//            job.setCommunicationSw(true);
+//            jobRepository.save(job);
+//            isUpdated=true;
+//        }
+//        return isUpdated;
+//    }
 }
 
 

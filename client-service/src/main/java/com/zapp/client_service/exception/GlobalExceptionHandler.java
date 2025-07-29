@@ -1,16 +1,19 @@
 package com.zapp.client_service.exception;
 
-import com.zapp.client_service.dto.ErrorResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 
+import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -21,107 +24,98 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleClientNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
-        log.warn("Client not found: clientId='{}', path='{}'", ex.getFieldValue(), request.getRequestURI());
-        return buildErrorResponse(
-                request.getRequestURI(),
-                HttpStatus.NOT_FOUND,
-                "Not Found",
-                ex.getMessage(),
-                null
-        );
+    public ResponseEntity<ProblemDetail> handleClientNotFound(ResourceNotFoundException ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND, ex.getMessage());
+        problemDetail.setTitle("Client Not Found");
+        problemDetail.setType(URI.create("https://api.zapp-hrms.com/problems/client-not-found"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getDescription(false));
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
 
-    @ExceptionHandler(ClientAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponseDto> handleClientAlreadyExists(ClientAlreadyExistsException ex, HttpServletRequest request) {
-        log.warn("Client already exists: clientName='{}', path='{}'", ex.getClientName(), request.getRequestURI());
-        return buildErrorResponse(
-                request.getRequestURI(),
-                HttpStatus.CONFLICT,
-                "Conflict",
-                ex.getMessage(),
-                null
-        );
-    }
+//    @ExceptionHandler(ClientAlreadyExistsException.class)
+//    public ResponseEntity<ErrorResponseDto> handleClientAlreadyExists(ClientAlreadyExistsException ex, HttpServletRequest request) {
+//        log.warn("Client already exists: clientName='{}', path='{}'", ex.getClientName(), request.getRequestURI());
+//        return buildErrorResponse(
+//                request.getRequestURI(),
+//                HttpStatus.CONFLICT,
+//                "Conflict",
+//                ex.getMessage(),
+//                null
+//        );
+//    }
 
-    @ExceptionHandler(BusinessValidationException.class)
-    public ResponseEntity<ErrorResponseDto> handleBusinessValidation(BusinessValidationException ex, HttpServletRequest request) {
-        log.warn("Business validation failed: field='{}', rejectedValue='{}', path='{}'",
-                ex.getField(), ex.getRejectedValue(), request.getRequestURI());
-        Map<String, Object> details = new HashMap<>();
-        details.put("field", ex.getField());
-        details.put("rejectedValue", ex.getRejectedValue());
-        return buildErrorResponse(
-                request.getRequestURI(),
-                HttpStatus.BAD_REQUEST,
-                "Bad Request",
-                ex.getMessage(),
-                details
-        );
+    @ExceptionHandler(ClientValidationException.class)
+    public ResponseEntity<ProblemDetail> handleClientValidation(ClientValidationException ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, ex.getMessage());
+        problemDetail.setTitle("Client Validation Failed");
+        problemDetail.setType(URI.create("https://api.zapp-hrms.com/problems/client-validation-failed"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getDescription(false));
+
+        if (ex.getErrors() != null && !ex.getErrors().isEmpty()) {
+            problemDetail.setProperty("validationErrors", ex.getErrors());
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
-        log.warn("Validation failed for request to path='{}'", request.getRequestURI());
+    public ResponseEntity<ProblemDetail> handleValidationExceptions(
+            MethodArgumentNotValidException ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, "Request validation failed");
+        problemDetail.setTitle("Request Validation Failed");
+        problemDetail.setType(URI.create("https://api.zapp-hrms.com/problems/request-validation-failed"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getDescription(false));
 
-        Map<String, String> errors = new LinkedHashMap<>();
-        for (var error : ex.getBindingResult().getAllErrors()) {
-            String fieldName = error instanceof FieldError ? ((FieldError) error).getField() : error.getObjectName();
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
-        }
-        return buildErrorResponse(
-                request.getRequestURI(),
-                HttpStatus.BAD_REQUEST,
-                "Bad Request",
-                "Validation failed",
-                errors
-        );
+        });
+        problemDetail.setProperty("fieldErrors", errors);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponseDto> handleConstraintViolation(ConstraintViolationException ex, HttpServletRequest request) {
-        log.warn("Constraint violation for request to path='{}'", request.getRequestURI());
+    public ResponseEntity<ProblemDetail> handleConstraintViolationExceptions(
+            ConstraintViolationException ex, WebRequest request) {
 
-        Map<String, String> errors = new LinkedHashMap<>();
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, "Constraint violation");
+        problemDetail.setTitle("Request Constraint Violation");
+        problemDetail.setType(URI.create("https://api.zapp-hrms.com/problems/constraint-violation"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getDescription(false));
+
+        // Collect all constraint violations, typically for param/path validations
+        Map<String, String> errors = new HashMap<>();
         ex.getConstraintViolations().forEach(violation -> {
-            String field = violation.getPropertyPath().toString();
-            String message = violation.getMessage();
-            errors.put(field, message);
+            String fieldPath = violation.getPropertyPath().toString();
+            String errorMessage = violation.getMessage();
+            errors.put(fieldPath, errorMessage);
         });
-        return buildErrorResponse(
-                request.getRequestURI(),
-                HttpStatus.BAD_REQUEST,
-                "Bad Request",
-                "Validation failed",
-                errors
-        );
+        problemDetail.setProperty("fieldErrors", errors);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception ex, HttpServletRequest request) {
-        log.error("Unexpected error occurred for request to path='{}'", request.getRequestURI(), ex);
-        return buildErrorResponse(
-                request.getRequestURI(),
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Internal Server Error",
-                ex.getMessage(),
-                null
-        );
-    }
+    public ResponseEntity<ProblemDetail> handleGenericException(Exception ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+        problemDetail.setTitle("Internal Server Error");
+        problemDetail.setType(URI.create("https://api.zapp-hrms.com/problems/internal-server-error"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getDescription(false));
 
-    // Utility method to reduce duplication
-    private ResponseEntity<ErrorResponseDto> buildErrorResponse(
-            String path, HttpStatus status, String error, String message, Object details) {
-        return ResponseEntity.status(status).body(
-                ErrorResponseDto.builder()
-                        .path(path)
-                        .status(status.value())
-                        .error(error)
-                        .message(message)
-                        .timestamp(LocalDateTime.now())
-                        .details(details)
-                        .build()
-        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
     }
 }

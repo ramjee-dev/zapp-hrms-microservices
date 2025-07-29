@@ -1,35 +1,47 @@
 package com.zapp.client_service.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.zapp.client_service.enums.ClientStatus;
+import com.zapp.client_service.enums.ClientType;
+import jakarta.validation.constraints.*;
 
-@Data@Builder
-@AllArgsConstructor@NoArgsConstructor
-public class ClientPageRequestDto {
+public record ClientPageRequestDto(
+        @Min(0)
+        int page,
 
-    @Min(value = 0, message = "Page number must be non-negative")
-    private int page = 0;
+        @Min(1)
+        @Max(100)
+        int size,
 
-    @Min(value = 1, message = "Page size must be at least 1")
-    @Max(value = 100, message = "Page size must not exceed 100")
-    private int size = 20;
+        @NotBlank
+        String sortBy,
 
-    private String sortBy = "clientId";
+        @Pattern(regexp = "ASC|DESC", flags = Pattern.Flag.CASE_INSENSITIVE,
+                message = "sortDir must be 'ASC' or 'DESC'")
+        String sortDir,
 
-    @Pattern(regexp = "^(asc|desc)$", message = "Sort direction must be 'asc' or 'desc'")
-    private String sortDir = "asc";
+        // Filters
+        ClientStatus status,
+        ClientType clientType,
 
-    // Filtering parameters
-    private String name;
-    private String location;
-    private Status status;
+        @Size(max = 255, message = "Industry must be at most 255 characters")
+        String industry,
 
-    public enum Status {
-        ACTIVE, INACTIVE
+        @Size(max = 255, message = "Country must be at most 255 characters")
+        String country,
+
+        @Size(max = 255, message = "Company name must be at most 255 characters")
+        String companyName
+) {
+    public ClientPageRequestDto {
+        // Enforce defaults
+        page = (page < 0) ? 0 : page;
+        size = (size <= 0) ? 10 : Math.min(size, 100);
+        sortBy = (sortBy == null || sortBy.isBlank()) ? "createdAt" : sortBy.trim();
+        sortDir = (sortDir == null || sortDir.isBlank()) ? "DESC" : sortDir.trim().toUpperCase();
+
+        // Optional fields trimming for consistency (null safe)
+        industry = (industry != null && !industry.isBlank()) ? industry.trim() : null;
+        country  = (country  != null && !country.isBlank())  ? country.trim()  : null;
+        companyName = (companyName != null && !companyName.isBlank()) ? companyName.trim() : null;
     }
 }

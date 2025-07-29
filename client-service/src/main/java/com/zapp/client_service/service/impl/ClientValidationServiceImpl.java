@@ -1,9 +1,10 @@
 package com.zapp.client_service.service.impl;
 
-import com.zapp.client_service.dto.ClientCreateRequestDto;
-import com.zapp.client_service.dto.ClientPartialUpdateRequestDto;
-import com.zapp.client_service.dto.ClientUpdateRequestDto;
-import com.zapp.client_service.exception.BusinessValidationException;
+import com.zapp.client_service.dto.CreateClientRequestDto;
+import com.zapp.client_service.dto.UpdateClientRequestDto;
+import com.zapp.client_service.entity.Client;
+import com.zapp.client_service.enums.ClientStatus;
+import com.zapp.client_service.exception.ClientValidationException;
 import com.zapp.client_service.service.IClientValidationService;
 import jakarta.validation.Valid;
 import lombok.NonNull;
@@ -11,68 +12,135 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ClientValidationServiceImpl implements IClientValidationService {
 
+
+    /**
+     * Validates business rules for creating a new client.
+     */
     @Override
-    public void validateForCreate(@Valid ClientCreateRequestDto clientDto) {
+    public void validateCreateClientRequest(CreateClientRequestDto dto) {
 
-        log.debug("Validating Client data for creation: name='{}'",clientDto.getName());
+        log.debug("Validating client creation: {}", dto.email());
 
-        validateClientName(clientDto.getName());
-    }
+        List<String> errors = new ArrayList<>();
 
-    @Override
-    public void validateForUpdate(@NonNull Long clientId, @Valid ClientUpdateRequestDto dto) {
+        // Example: Ensure client cannot be created with inactive status
+        // (Usually, new clients are PENDING_APPROVAL, but you can modify as needed)
+        // (If CreateClientDto contains status, uncomment below)
+        // if (dto.status() != null && dto.status() != ClientStatus.PENDING_APPROVAL) {
+        //     errors.add("New clients must be in PENDING_APPROVAL status");
+        // }
 
-        log.debug("Validating client data for update: id={}, name='{}'", clientId, dto.getName());
+        // Business validation: client email must be unique
+        // (This is handled by @UniqueConstraint, but you can add explicit DB check here if needed)
 
-        validateClientId(clientId);
-        validateClientName(dto.getName());
-
-    }
-
-    @Override
-    public void validateForPartialUpdate(@NonNull Long clientId, @Valid ClientPartialUpdateRequestDto dto) {
-
-        log.debug("Validating client data for partial update: id={}", clientId);
-
-        validateClientId(clientId);
-
-        if (dto.getName() != null) {
-            validateClientName(dto.getName());
+        // Business validation: employee count must be at least 1 if present, not null
+        if (dto.employeeCount() != null && dto.employeeCount() < 1) {
+            errors.add("Employee count must be at least 1");
         }
 
-        // Ensure at least one field is provided for update
-        if(dto.getName()==null&&dto.getLocation()==null&&dto.getStatus()==null){
-            throw new BusinessValidationException("At least one field must be provided for partial update","request",dto);
-        }
+        // Additional business logic can be added here
+        // E.g., validate industry, country, company name format, etc.
 
+        // Raise exception if any business rule is violated
+        if (!errors.isEmpty()) {
+            log.warn("Client creation validation failed: {}", errors);
+            throw new ClientValidationException("Client validation failed", errors);
+        }
+        log.info("Client creation validation passed: {}", dto.email());
     }
 
+    /**
+     * Validates business rules for updating an existing client.
+     */
     @Override
-    public void validateForDelete(Long clientId) {
+    public void validateUpdateClientRequest(UUID clientId, UpdateClientRequestDto dto) {
+        log.debug("Validating update for client: {}", clientId);
+        List<String> errors = new ArrayList<>();
 
-        log.debug("Validating client for deletion: id={}", clientId);
+        // Business validation: employee count must be at least 1 if present, not null
+        if (dto.employeeCount() != null && dto.employeeCount() < 1) {
+            errors.add("Employee count must be at least 1");
+        }
 
-        validateClientId(clientId);
+        // Additional business logic can be added here
+        // E.g., validate industry, country, company name format, etc.
 
-        // check if client has associated data that prevents deletion
+        // Raise exception if any business rule is violated
+        if (!errors.isEmpty()) {
+            log.warn("Client update validation failed for client {}: {}", clientId, errors);
+            throw new ClientValidationException("Client update validation failed", errors);
+        }
+        log.info("Client update validation passed: {}", clientId);
     }
 
-    private  void validateClientId(Long clientId) {
+    /**
+     * Validates business rules for client status transition.
+     * E.g., "Suspended" clients cannot directly become "Active"; only "Pending Approval" can become "Active".
+     */
+    @Override
+    public void validateStatusTransition(Client client, ClientStatus newStatus) {
+        log.debug("Validating client status transition from {} to {} for client {}",
+                client.getStatus(), newStatus, client.getId());
 
-        if(clientId ==null || clientId <=0){
-            throw  new BusinessValidationException("Client ID must be a positive number","clientId",clientId);
+        ClientStatus currentStatus = client.getStatus();
+        boolean isValidTransition = false;
+
+        // Define your business rules for valid status transitions here
+        if (currentStatus == ClientStatus.PENDING_APPROVAL && newStatus == ClientStatus.ACTIVE) {
+            isValidTransition = true;
+        } else if (
+                (currentStatus == ClientStatus.ACTIVE && newStatus == ClientStatus.INACTIVE) ||
+                        (currentStatus == ClientStatus.ACTIVE && newStatus == ClientStatus.SUSPENDED) ||
+                        (currentStatus == ClientStatus.INACTIVE && newStatus == ClientStatus.ACTIVE) ||
+                        (currentStatus == ClientStatus.SUSPENDED && newStatus == ClientStatus.ACTIVE)
+        ) {
+            isValidTransition = true;
         }
+        // Add more valid transition rules as needed
+
+        if (!isValidTransition) {
+            String message = String.format("Invalid status transition from %s to %s", currentStatus, newStatus);
+            log.warn("Status transition validation failed for client {}: {}", client.getId(), message);
+            throw new ClientValidationException("Invalid status transition", List.of(message));
+        }
+        log.info("Status transition validation passed for client {} to {}", client.getId(), newStatus);
     }
 
-    private void validateClientName(String name) {
+    /**
+     * Validates business rules for client deletion.
+     * E.g., active clients with jobs/candidates cannot be deleted.
+     */
+    @Override
+    public void validateClientDeletion(Client client) {
+        log.debug("Validating deletion for client: {}", client.getId());
+        List<String> errors = new ArrayList<>();
 
-        if(name!=null && name.trim().toLowerCase().contains("test")){
-            throw  new BusinessValidationException("Client name can not contain 'test' keyword","name",name);
+        // Business rule: cannot delete client that is ACTIVE (or add your own logic)
+        if (client.getStatus() == ClientStatus.ACTIVE) {
+            errors.add("Active clients cannot be deleted");
         }
+
+        // Business rule: cannot delete client with jobs (would need reference to job-service, so consider this as a placeholder)
+        // if (jobService.countJobsByClientId(client.getId()) > 0) {
+        //     errors.add("Client with associated jobs cannot be deleted");
+        // }
+
+        // Add your own business rules as needed
+
+        // Raise exception if any business rule is violated
+        if (!errors.isEmpty()) {
+            log.warn("Client deletion validation failed for client {}: {}", client.getId(), errors);
+            throw new ClientValidationException("Client deletion validation failed", errors);
+        }
+        log.info("Client deletion validation passed: {}", client.getId());
     }
 }

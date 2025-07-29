@@ -8,15 +8,15 @@ import java.util.UUID;
 public interface IJobService {
 
 
-    JobResponseDto createJob(CreateJobDto dto);
+    JobResponseDto createJob(CreateJobRequestDto dto);
 
     JobResponseDto fetchJobById(UUID jobId);
 
     PagedJobResponseDto fetchAllJobs(JobPageRequestDto requestDto);
 
-    JobResponseDto updateJob(UUID jobId, UpdateJobDto updateJobDto);
+    JobResponseDto updateJob(UUID jobId, UpdateJobRequestDto updateJobRequestDto);
 
-    JobResponseDto partialUpdateJob(UUID jobId, PartialUpdateJobDto partialUpdateJobDto);
+    JobResponseDto partialUpdateJob(UUID jobId, PartialUpdateJobRequestDto partialUpdateJobRequestDto);
 
     JobResponseDto changeJobStatus (UUID jobId, JobStatus status);
 

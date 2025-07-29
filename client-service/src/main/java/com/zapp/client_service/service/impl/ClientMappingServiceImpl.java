@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,87 +15,169 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ClientMappingServiceImpl implements IClientMappingService {
 
-    @Override
-    public Client toEntity(ClientCreateRequestDto dto) {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_INSTANT;
 
-        log.debug("Mapping ClientCreateRequestDto to Client entity");
-        return Client.builder()
-                .name(dto.getName().trim())
-                .location(dto.getLocation()!=null? dto.getLocation().trim() :null )
-                .build();
+    @Override
+    public Client toEntity(CreateClientRequestDto dto) {
+        log.debug("Mapping CreateClientRequestDto to Client entity, companyName: {}, email: {}",
+                dto.companyName(), dto.email());
+
+        Client client = new Client();
+        client.setCompanyName(dto.companyName());
+        client.setContactPerson(dto.contactPerson());
+        client.setEmail(dto.email());
+        client.setPhone(dto.phone());
+        client.setAddress(dto.address());
+        client.setCity(dto.city());
+        client.setState(dto.state());
+        client.setPostalCode(dto.postalCode());
+        client.setCountry(dto.country());
+        client.setWebsite(dto.website());
+        client.setClientType(dto.clientType());
+        client.setDescription(dto.description());
+        client.setEmployeeCount(dto.employeeCount());
+        client.setIndustry(dto.industry());
+
+        log.info("Created new Client entity, companyName: {}, email: {}",
+                client.getCompanyName(), client.getEmail());
+        return client;
     }
 
     @Override
-    public Client toEntity(ClientUpdateRequestDto dto) {
+    public void updateEntity(Client client, UpdateClientRequestDto dto) {
+        log.debug("Updating Client entity, id: {}, companyName: {}",
+                client.getId(), dto.companyName());
 
-        log.debug("Mapping ClientUpdateRequestDto to Client entity");
-        return Client.builder()
-                .name(dto.getName().trim())
-                .location(dto.getLocation() != null ? dto.getLocation().trim() : null)
-                .status(dto.getStatus() != null ?
-                        Client.Status.valueOf(dto.getStatus().name()) : Client.Status.ACTIVE)
-                .build();
+        String prevCompanyName = client.getCompanyName();
+        client.setCompanyName(dto.companyName());
+        client.setContactPerson(dto.contactPerson());
+        client.setPhone(dto.phone());
+        client.setAddress(dto.address());
+        client.setCity(dto.city());
+        client.setState(dto.state());
+        client.setPostalCode(dto.postalCode());
+        client.setCountry(dto.country());
+        client.setWebsite(dto.website());
+        client.setClientType(dto.clientType());
+        client.setDescription(dto.description());
+        client.setEmployeeCount(dto.employeeCount());
+        client.setIndustry(dto.industry());
+
+        log.info("Updated Client entity, id: {}, previous companyName: {}, new companyName: {}",
+                client.getId(), prevCompanyName, client.getCompanyName());
     }
 
     @Override
-    public ClientResponseDto toResponseDto(Client entity) {
+    public void partialUpdateEntity(Client existingClient, PartialUpdateClientRequestDto dto) {
+        log.debug("Performing partial update on Client entity, id: {}", existingClient.getId());
 
-        log.debug("Mapping client entity to ClientResponseDto: id={}",entity.getClientId());
-        return ClientResponseDto.builder()
-                .clientId(entity.getClientId())
-                .name(entity.getName())
-                .location(entity.getLocation())
-                .status(ClientResponseDto.Status.valueOf(entity.getStatus().name()))
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .build();
-    }
-
-    @Override
-    public List<ClientResponseDto> toResponseDtoList(List<Client> entities) {
-
-        log.debug("Mapping {} Client entities to ClientResponseDto list", entities.size());
-
-        return entities.stream().map(this::toResponseDto).collect(Collectors.toList());
-    }
-
-    @Override
-    public ClientPageResponseDto toPageResponseDto(Page<Client> page) {
-
-        log.debug("Mapping Client page to ClientPageResponseDto: page={}, size={}, totalElements={}",
-                page.getNumber(), page.getSize(), page.getTotalElements());
-
-        return ClientPageResponseDto.builder()
-                .page(page.getNumber())
-                .size(page.getSize())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .first(page.isFirst())
-                .last(page.isLast())
-                .hasNext(page.hasNext())
-                .hasPrevious(page.hasPrevious())
-                .content(toResponseDtoList(page.getContent()))
-                .build();
-    }
-
-    @Override
-    public void mapPartialUpdate(ClientPartialUpdateRequestDto dto, Client existingClient) {
-
-        log.debug("Applying partial update to Client entity: id={}", existingClient.getClientId());
-
-        if(dto.getName()!=null){
-            existingClient.setName(dto.getName().trim());
+        if (dto.companyName() != null) {
+            log.debug("Updating companyName from {} to {}",
+                    existingClient.getCompanyName(), dto.companyName());
+            existingClient.setCompanyName(dto.companyName());
+        }
+        if (dto.contactPerson() != null) {
+            log.debug("Updating contactPerson from {} to {}",
+                    existingClient.getContactPerson(), dto.contactPerson());
+            existingClient.setContactPerson(dto.contactPerson());
+        }
+//        if (dto.email() != null) {
+//            log.debug("Updating email from {} to {}",
+//                    existingClient.getEmail(), dto.email());
+//            existingClient.setEmail(dto.email());
+//        }
+        if (dto.phone() != null) {
+            log.debug("Updating phone from {} to {}",
+                    existingClient.getPhone(), dto.phone());
+            existingClient.setPhone(dto.phone());
+        }
+        if (dto.address() != null) {
+            log.debug("Updating address");
+            existingClient.setAddress(dto.address());
+        }
+        if (dto.city() != null) {
+            log.debug("Updating city from {} to {}",
+                    existingClient.getCity(), dto.city());
+            existingClient.setCity(dto.city());
+        }
+        if (dto.state() != null) {
+            log.debug("Updating state from {} to {}",
+                    existingClient.getState(), dto.state());
+            existingClient.setState(dto.state());
+        }
+        if (dto.postalCode() != null) {
+            log.debug("Updating postalCode from {} to {}",
+                    existingClient.getPostalCode(), dto.postalCode());
+            existingClient.setPostalCode(dto.postalCode());
+        }
+        if (dto.country() != null) {
+            log.debug("Updating country from {} to {}",
+                    existingClient.getCountry(), dto.country());
+            existingClient.setCountry(dto.country());
+        }
+        if (dto.website() != null) {
+            log.debug("Updating website from {} to {}",
+                    existingClient.getWebsite(), dto.website());
+            existingClient.setWebsite(dto.website());
+        }
+        if (dto.clientType() != null) {
+            log.debug("Updating clientType from {} to {}",
+                    existingClient.getClientType(), dto.clientType());
+            existingClient.setClientType(dto.clientType());
+        }
+//        if (dto.status() != null) {
+//            log.debug("Updating status from {} to {}",
+//                    existingClient.getStatus(), dto.status());
+//            existingClient.setStatus(dto.status());
+//        }
+        if (dto.description() != null) {
+            log.debug("Updating description");
+            existingClient.setDescription(dto.description());
+        }
+        if (dto.employeeCount() != null) {
+            log.debug("Updating employeeCount from {} to {}",
+                    existingClient.getEmployeeCount(), dto.employeeCount());
+            existingClient.setEmployeeCount(dto.employeeCount());
+        }
+        if (dto.industry() != null) {
+            log.debug("Updating industry from {} to {}",
+                    existingClient.getIndustry(), dto.industry());
+            existingClient.setIndustry(dto.industry());
         }
 
-        if(dto.getLocation()!=null){
-            existingClient.setLocation(dto.getLocation().trim());
-        }
-
-        if(dto.getStatus()!=null){
-            existingClient.setStatus(Client.Status.valueOf(dto.getStatus().name()));
-        }
-
+        log.info("Partially updated Client entity, id: {}", existingClient.getId());
     }
 
+    @Override
+    public ClientResponseDto toResponseDto(Client client) {
+        log.debug("Mapping Client entity to ClientResponseDto, id: {}", client.getId());
+        return new ClientResponseDto(
+                client.getId(),
+                client.getCompanyName(),
+                client.getContactPerson(),
+                client.getEmail(),
+                client.getPhone(),
+                client.getAddress(),
+                client.getCity(),
+                client.getState(),
+                client.getPostalCode(),
+                client.getCountry(),
+                client.getWebsite(),
+                client.getClientType(),
+                client.getStatus(),
+                client.getDescription(),
+                client.getEmployeeCount(),
+                client.getIndustry(),
+                client.getCreatedAt() != null ? FORMATTER.format(client.getCreatedAt()) : null,
+                client.getUpdatedAt() != null ? FORMATTER.format(client.getUpdatedAt()) : null,
+                client.getCreatedBy(),
+                client.getUpdatedBy()
+        );
+    }
 
+    @Override
+    public List<ClientResponseDto> toResponseDtoList(List<Client> clients) {
+        log.debug("Converting list of {} Client entities to ClientResponseDto list", clients.size());
+        return clients.stream().map(this::toResponseDto).toList();
+    }
 }

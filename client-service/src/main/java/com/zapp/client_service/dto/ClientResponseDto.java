@@ -1,29 +1,29 @@
 package com.zapp.client_service.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.zapp.client_service.enums.ClientStatus;
+import com.zapp.client_service.enums.ClientType;
 
-import java.time.LocalDateTime;
+import java.util.UUID;
 
-@NoArgsConstructor@AllArgsConstructor
-@Data@Builder
-public class ClientResponseDto {
-    private Long clientId;
-
-    private String name;
-
-    private String location;
-
-    private Status status;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
-    public enum Status {
-        ACTIVE,
-        INACTIVE
-    }
-}
+public record ClientResponseDto(
+        UUID id,
+        String companyName,
+        String contactPerson,
+        String email,
+        String phone,
+        String address,
+        String city,
+        String state,
+        String postalCode,
+        String country,
+        String website,
+        ClientType clientType,
+        ClientStatus status,
+        String description,
+        Integer employeeCount,
+        String industry,
+        String createdAt,
+        String updatedAt,
+        String createdBy,
+        String updatedBy
+) {}

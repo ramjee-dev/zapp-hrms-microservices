@@ -1,7 +1,11 @@
 package com.zapp.client_service.entity;
 
+import com.zapp.client_service.enums.ClientStatus;
+import com.zapp.client_service.enums.ClientType;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "clients")
@@ -10,21 +14,54 @@ import lombok.*;
 public class Client extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long clientId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    @Column(nullable = false, unique = true,length = 100)
-    private String name;
+    @Column(name = "company_name", nullable = false)
+    private String companyName;
 
-    @Column(nullable = false,length = 100)
-    private String location;
+    @Column(name = "contact_person", nullable = false)
+    private String contactPerson;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "state")
+    private String state;
+
+    @Column(name = "postal_code")
+    private String postalCode;
+
+    @Column(name = "country")
+    private String country;
+
+    @Column(name = "website")
+    private String website;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false,length = 20)
-    private Status status = Status.ACTIVE;
+    @Column(name = "client_type", nullable = false)
+    private ClientType clientType;
 
-    public enum Status {
-        ACTIVE,
-        INACTIVE
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ClientStatus status = ClientStatus.PENDING_APPROVAL;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "employee_count")
+    private Integer employeeCount;
+
+    @Column(name = "industry")
+    private String industry;
+
 }

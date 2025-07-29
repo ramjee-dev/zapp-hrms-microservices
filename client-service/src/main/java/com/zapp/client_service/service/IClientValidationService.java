@@ -1,17 +1,20 @@
 package com.zapp.client_service.service;
 
-import com.zapp.client_service.dto.ClientCreateRequestDto;
-import com.zapp.client_service.dto.ClientPartialUpdateRequestDto;
-import com.zapp.client_service.dto.ClientUpdateRequestDto;
+import com.zapp.client_service.dto.CreateClientRequestDto;
+import com.zapp.client_service.dto.UpdateClientRequestDto;
+import com.zapp.client_service.entity.Client;
+import com.zapp.client_service.enums.ClientStatus;
+
+import java.util.UUID;
 
 public interface IClientValidationService {
 
-    void validateForCreate(ClientCreateRequestDto clientDto);
+    void validateCreateClientRequest(CreateClientRequestDto dto);
 
-    void validateForUpdate(Long clientId, ClientUpdateRequestDto dto);
+    void validateUpdateClientRequest(UUID clientId, UpdateClientRequestDto dto);
 
-    void validateForPartialUpdate(Long clientId, ClientPartialUpdateRequestDto dto);
+    void validateStatusTransition(Client existingClient, ClientStatus newStatus);
 
-    void validateForDelete(Long clientId);
+    void validateClientDeletion(Client client);
 
 }
