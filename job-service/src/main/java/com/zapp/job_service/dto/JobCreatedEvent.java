@@ -6,13 +6,14 @@ import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class JobCreatedEvent {
 
-    private Long jobId;
+    private UUID jobId;
     private String jobTitle;
     private String clientName;
     private String createdBy; // BD username or full name

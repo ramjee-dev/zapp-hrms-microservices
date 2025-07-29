@@ -1,34 +1,26 @@
 package com.zapp.job_service.service;
 
-import com.zapp.job_service.dto.JobDto;
+import com.zapp.job_service.dto.*;
+import com.zapp.job_service.enums.JobStatus;
+
+import java.util.UUID;
 
 public interface IJobService {
 
-    /**
-     * @param dto - Input JobDto object
-     */
-    void createJob(JobDto dto);
 
-//    List<JobResponseDTO> getAllJobs(Optional<Long> clientId, Optional<Job.JobStatus> status);
+    JobResponseDto createJob(CreateJobDto dto);
 
-    /**
-     * @param jobId - Input JobId
-     * @return Job Details based on given JobId
-     */
-    JobDto fetchJobById(Long jobId);
+    JobResponseDto fetchJobById(UUID jobId);
 
-    /**
-     * @param jobId - Input JobId
-     * @param jobDto - Input JobDto object
-     * @return boolean indicating if the update of Job details is successful or not
-     */
-    boolean updateJob(Long jobId, JobDto jobDto);
+    PagedJobResponseDto fetchAllJobs(JobPageRequestDto requestDto);
 
-    /**
-     * @param jobId - Input JobId
-     * @return boolean indicating if the delete of Job details is successful or not
-     */
-    boolean deleteJob(Long jobId);
+    JobResponseDto updateJob(UUID jobId, UpdateJobDto updateJobDto);
+
+    JobResponseDto partialUpdateJob(UUID jobId, PartialUpdateJobDto partialUpdateJobDto);
+
+    JobResponseDto changeJobStatus (UUID jobId, JobStatus status);
+
+    void deleteJob(UUID jobId);
 
     boolean updateCommunicationStatus(Long jobId);
 }

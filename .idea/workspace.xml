@@ -5,19 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a03bcff3-eb89-4fa4-abcb-6c4678f153c8" name="Changes" comment="implemented User-service APIs">
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/constants/ClientsConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/constants/ClientsConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/ICandidateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/ICandidateService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/controller/ClientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/controller/ClientController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ErrorResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ErrorResponseDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ResponseDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/entity/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/entity/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/ClientAlreadyExistsException.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/ClientAlreadyExistsException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/ResourceNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/ResourceNotFoundException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/mapper/ClientMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/mapper/ClientMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/repository/ClientRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/repository/ClientRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/IClientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/IClientService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/impl/ClientServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/impl/ClientServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/controller/JobController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/JobCreatedEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/JobCreatedEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/ResponseDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/entity/BaseEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/entity/BaseEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/entity/Job.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/entity/Job.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/repository/JobRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/repository/JobRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobService.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/impl/JobServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/impl/JobServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +26,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="package-info" />
+        <option value="Enum" />
+        <option value="Record" />
         <option value="Interface" />
         <option value="Class" />
       </list>

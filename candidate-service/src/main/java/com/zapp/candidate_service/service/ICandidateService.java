@@ -9,18 +9,10 @@ import org.springframework.data.domain.Pageable;
 
 public interface ICandidateService {
 
-    /**
-     * @param jobId - Input JobId
-     * @param dto - Input CandidateDto object
-     */
     void addCandidateToJob(Long jobId, CandidateDto dto);
 
     Page<Candidate> getAllCandidates(Pageable pageable, CandidateFilter filter);
 
-    /**
-     * @param candidateId - Input CandidateId
-     * @return Candidate Details based on given CandidateId
-     */
     CandidateDto getCandidateById(Long candidateId);
 
     Candidate updateCandidate(Long id, CandidateDto dto);
