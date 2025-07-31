@@ -1,28 +1,31 @@
 package com.zapp.candidate_service.service;
 
-import com.zapp.candidate_service.dto.CandidateDto;
-import com.zapp.candidate_service.dto.CandidateDto;
-import com.zapp.candidate_service.dto.CandidateFilter;
+import com.zapp.candidate_service.dto.*;
 import com.zapp.candidate_service.entity.Candidate;
+import com.zapp.candidate_service.enums.CandidateStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.UUID;
+
 public interface ICandidateService {
 
-    void addCandidateToJob(Long jobId, CandidateDto dto);
+    CandidateResponseDto createCandidate(CreateCandidateRequestDto dto);
 
-    Page<Candidate> getAllCandidates(Pageable pageable, CandidateFilter filter);
+    CandidateResponseDto fetchCandidateById(UUID candidateId);
 
-    CandidateDto getCandidateById(Long candidateId);
+    PagedCandidateResponseDto fetchAllCandidates(CandidatePageRequestDto pageRequestDto);
 
-    Candidate updateCandidate(Long id, CandidateDto dto);
+    CandidateResponseDto updateCandidate(UUID candidateId, UpdateCandidateRequestDto dto);
 
-    Candidate updateCandidateStatus(Long id, Candidate.Status status);
+    CandidateResponseDto partialUpdateCandidate(UUID candidateId, PartialUpdateCandidateRequestDto dto);
 
-    void deleteCandidate(Long id);
+    CandidateResponseDto changeCandidateStatus(UUID candidateId, CandidateStatus status);
 
-    boolean updateCommunicationStatus(Long candidateId);
+    void deleteCandidate(UUID candidateId);
 
-    public boolean updateStatusCommunicationMap(Long id, String status);
+    boolean updateCommunicationStatus(UUID candidateId);
+
+    public boolean updateStatusCommunicationMap(UUID candidateId, String status);
 }
 

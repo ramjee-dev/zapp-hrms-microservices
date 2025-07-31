@@ -28,7 +28,7 @@ public record CreateJobRequestDto(
         String department,
 
         @NotNull(message = "Priority is required")
-        JobPriority priority,
+        JobPriority priority, // proper validation for job priority
 
         @Size(max = 1000, message = "Required skills must not exceed 1000 characters")
         String requiredSkills,
@@ -40,7 +40,7 @@ public record CreateJobRequestDto(
         String salaryRange,
 
         @NotNull(message = "Employment type is required")
-        EmploymentType employmentType,
+        EmploymentType employmentType, // proper validation for employmentType
 
         @Min(value = 1, message = "Positions available must be at least 1")
         @Max(value = 100, message = "Positions available must not exceed 100")

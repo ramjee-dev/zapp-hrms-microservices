@@ -24,11 +24,11 @@ import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "/api/v1/jobs",produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/api/v1/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
 @Validated
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "Job Management",description = "APIs for managing jobs in the HRMS system")
+@Tag(name = "Job Management", description = "APIs for managing jobs in the HRMS system")
 public class JobController {
 
     private final IJobService jobService;
@@ -40,6 +40,8 @@ public class JobController {
                     content = @Content(schema = @Schema(implementation = JobResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid job data",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
@@ -62,6 +64,8 @@ public class JobController {
                     content = @Content(schema = @Schema(implementation = JobResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Job not found",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
@@ -74,17 +78,19 @@ public class JobController {
         return ResponseEntity.ok(job);
     }
 
+    @GetMapping
     @Operation(summary = "Get all jobs with pagination and filtering",
             description = "Retrieves all jobs with support for pagination, sorting, and filtering")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Jobs retrieved successfully",
                     content = @Content(schema = @Schema(implementation = PagedJobResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
-    @GetMapping
-    public ResponseEntity<PagedJobResponseDto> getAllJobs(@Valid @ParameterObject
-                                                              @ModelAttribute JobPageRequestDto requestDto) {
+    public ResponseEntity<PagedJobResponseDto> getAllJobs(
+            @Valid @ParameterObject @ModelAttribute JobPageRequestDto requestDto) {
 
         log.debug("Received request to get all jobs with pagination, requestDto={}", requestDto);
 
@@ -97,10 +103,12 @@ public class JobController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Job updated successfully",
                     content = @Content(schema = @Schema(implementation = JobResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "Job not found",
-                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
             @ApiResponse(responseCode = "400", description = "Invalid job data",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "404", description = "Job not found",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
@@ -117,45 +125,49 @@ public class JobController {
     @PatchMapping("/{id}")
     @Operation(summary = "Partially update job", description = "Updates specific fields of an existing job")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Job Partially updated successfully",
+            @ApiResponse(responseCode = "200", description = "Job partially updated successfully",
                     content = @Content(schema = @Schema(implementation = JobResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Job not found",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid job data",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
     public ResponseEntity<JobResponseDto> partialUpdateJob(
-            @Parameter(description = "Job ID") @PathVariable UUID id,
+            @Parameter(description = "Job ID") @PathVariable("id") UUID jobId,
             @Valid @RequestBody PartialUpdateJobRequestDto partialUpdateJobRequestDto) {
 
-        log.info("Received request to partially update job with id: {}", id);
+        log.info("Received request to partially update job with id: {}", jobId);
 
-        JobResponseDto updatedJob = jobService.partialUpdateJob(id, partialUpdateJobRequestDto);
+        JobResponseDto updatedJob = jobService.partialUpdateJob(jobId, partialUpdateJobRequestDto);
         return ResponseEntity.ok(updatedJob);
     }
 
+    @PatchMapping("/{id}/status")
     @Operation(summary = "Change job status", description = "Changes the status of a job")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Job status changed successfully",
                     content = @Content(schema = @Schema(implementation = JobResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "Job not found",
-                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
             @ApiResponse(responseCode = "400", description = "Invalid status transition",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "404", description = "Job not found",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
-
     })
-    @PatchMapping("/{id}/status")
     public ResponseEntity<JobResponseDto> changeJobStatus(
-            @Parameter(description = "Job ID") @PathVariable UUID jobId,
+            @Parameter(description = "Job ID") @PathVariable("id") UUID jobId,
             @Parameter(description = "New job status") @RequestParam JobStatus status) {
 
         log.info("Received request to change status of job {} to {}", jobId, status);
 
         JobResponseDto updatedJob = jobService.changeJobStatus(jobId, status);
         return ResponseEntity.ok(updatedJob);
-
     }
 
     @DeleteMapping("/{id}")
@@ -164,15 +176,18 @@ public class JobController {
             @ApiResponse(responseCode = "204", description = "Job deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Job not found",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
     public ResponseEntity<Void> deleteJob(
-            @Parameter(description = "Job ID") @PathVariable("id") UUID clientId) {
+            @Parameter(description = "Job ID") @PathVariable("id") UUID jobId) {
 
-        log.info("Received request to delete job with id: {}", clientId);
+        log.info("Received request to delete job with id: {}", jobId);
 
-        jobService.deleteJob(clientId);
+        jobService.deleteJob(jobId);
         return ResponseEntity.noContent().build();
     }
 }
+

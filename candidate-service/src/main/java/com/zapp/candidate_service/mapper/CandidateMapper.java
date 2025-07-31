@@ -1,6 +1,5 @@
 package com.zapp.candidate_service.mapper;
 
-import com.zapp.candidate_service.dto.CandidateDto;
 import com.zapp.candidate_service.entity.Candidate;
 
 public class CandidateMapper {

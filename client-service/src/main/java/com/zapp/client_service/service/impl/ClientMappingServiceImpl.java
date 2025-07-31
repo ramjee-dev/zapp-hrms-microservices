@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +20,7 @@ public class ClientMappingServiceImpl implements IClientMappingService {
 
     @Override
     public Client toEntity(CreateClientRequestDto dto) {
+
         log.debug("Mapping CreateClientRequestDto to Client entity, companyName: {}, email: {}",
                 dto.companyName(), dto.email());
 
@@ -36,8 +38,7 @@ public class ClientMappingServiceImpl implements IClientMappingService {
         client.setClientType(dto.clientType());
         client.setDescription(dto.description());
         client.setEmployeeCount(dto.employeeCount());
-        client.setIndustry(dto.industry());
-
+        client.setIndustry(dto.industry()); // need to set client default status
         log.info("Created new Client entity, companyName: {}, email: {}",
                 client.getCompanyName(), client.getEmail());
         return client;
@@ -47,7 +48,8 @@ public class ClientMappingServiceImpl implements IClientMappingService {
     public void updateEntity(Client client, UpdateClientRequestDto dto) {
         log.debug("Updating Client entity, id: {}, companyName: {}",
                 client.getId(), dto.companyName());
-
+// omit fields which are immutable after client creation like email is immutable
+// and also omit fields that have dedicated flow like status
         String prevCompanyName = client.getCompanyName();
         client.setCompanyName(dto.companyName());
         client.setContactPerson(dto.contactPerson());
@@ -69,88 +71,59 @@ public class ClientMappingServiceImpl implements IClientMappingService {
 
     @Override
     public void partialUpdateEntity(Client existingClient, PartialUpdateClientRequestDto dto) {
-        log.debug("Performing partial update on Client entity, id: {}", existingClient.getId());
+
+        log.debug("Starting partial update on Client entity with id: {}", existingClient.getId());
 
         if (dto.companyName() != null) {
-            log.debug("Updating companyName from {} to {}",
-                    existingClient.getCompanyName(), dto.companyName());
             existingClient.setCompanyName(dto.companyName());
         }
         if (dto.contactPerson() != null) {
-            log.debug("Updating contactPerson from {} to {}",
-                    existingClient.getContactPerson(), dto.contactPerson());
             existingClient.setContactPerson(dto.contactPerson());
         }
-//        if (dto.email() != null) {
-//            log.debug("Updating email from {} to {}",
-//                    existingClient.getEmail(), dto.email());
-//            existingClient.setEmail(dto.email());
-//        }
+        // email update intentionally excluded here per business rules/comment
         if (dto.phone() != null) {
-            log.debug("Updating phone from {} to {}",
-                    existingClient.getPhone(), dto.phone());
             existingClient.setPhone(dto.phone());
         }
         if (dto.address() != null) {
-            log.debug("Updating address");
             existingClient.setAddress(dto.address());
         }
         if (dto.city() != null) {
-            log.debug("Updating city from {} to {}",
-                    existingClient.getCity(), dto.city());
             existingClient.setCity(dto.city());
         }
         if (dto.state() != null) {
-            log.debug("Updating state from {} to {}",
-                    existingClient.getState(), dto.state());
             existingClient.setState(dto.state());
         }
         if (dto.postalCode() != null) {
-            log.debug("Updating postalCode from {} to {}",
-                    existingClient.getPostalCode(), dto.postalCode());
             existingClient.setPostalCode(dto.postalCode());
         }
         if (dto.country() != null) {
-            log.debug("Updating country from {} to {}",
-                    existingClient.getCountry(), dto.country());
             existingClient.setCountry(dto.country());
         }
         if (dto.website() != null) {
-            log.debug("Updating website from {} to {}",
-                    existingClient.getWebsite(), dto.website());
             existingClient.setWebsite(dto.website());
         }
         if (dto.clientType() != null) {
-            log.debug("Updating clientType from {} to {}",
-                    existingClient.getClientType(), dto.clientType());
             existingClient.setClientType(dto.clientType());
         }
-//        if (dto.status() != null) {
-//            log.debug("Updating status from {} to {}",
-//                    existingClient.getStatus(), dto.status());
-//            existingClient.setStatus(dto.status());
-//        }
+        // status update intentionally excluded here per business rules/comment
         if (dto.description() != null) {
-            log.debug("Updating description");
             existingClient.setDescription(dto.description());
         }
         if (dto.employeeCount() != null) {
-            log.debug("Updating employeeCount from {} to {}",
-                    existingClient.getEmployeeCount(), dto.employeeCount());
             existingClient.setEmployeeCount(dto.employeeCount());
         }
         if (dto.industry() != null) {
-            log.debug("Updating industry from {} to {}",
-                    existingClient.getIndustry(), dto.industry());
             existingClient.setIndustry(dto.industry());
         }
 
-        log.info("Partially updated Client entity, id: {}", existingClient.getId());
+        log.info("Completed partial update on Client entity with id: {}", existingClient.getId());
     }
 
     @Override
     public ClientResponseDto toResponseDto(Client client) {
-        log.debug("Mapping Client entity to ClientResponseDto, id: {}", client.getId());
+
+        log.trace("Mapping Client entity to ClientResponseDto, id: {}", client.getId());
+
         return new ClientResponseDto(
                 client.getId(),
                 client.getCompanyName(),
@@ -177,7 +150,13 @@ public class ClientMappingServiceImpl implements IClientMappingService {
 
     @Override
     public List<ClientResponseDto> toResponseDtoList(List<Client> clients) {
-        log.debug("Converting list of {} Client entities to ClientResponseDto list", clients.size());
-        return clients.stream().map(this::toResponseDto).toList();
+
+        int count = (clients == null) ? 0 : clients.size();
+        log.trace("Mapping list of {} Client entities to ClientResponseDto list", count);
+        if (clients == null) return List.of();
+        return clients.stream()
+                .filter(Objects::nonNull)
+                .map(this::toResponseDto)
+                .toList();
     }
 }

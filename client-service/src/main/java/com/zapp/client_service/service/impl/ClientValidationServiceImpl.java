@@ -1,146 +1,185 @@
 package com.zapp.client_service.service.impl;
 
 import com.zapp.client_service.dto.CreateClientRequestDto;
+import com.zapp.client_service.dto.PartialUpdateClientRequestDto;
 import com.zapp.client_service.dto.UpdateClientRequestDto;
 import com.zapp.client_service.entity.Client;
 import com.zapp.client_service.enums.ClientStatus;
-import com.zapp.client_service.exception.ClientValidationException;
+import com.zapp.client_service.exception.BusinessValidationException;
+import com.zapp.client_service.exception.ResourceNotFoundException;
+import com.zapp.client_service.repository.ClientRepository;
 import com.zapp.client_service.service.IClientValidationService;
-import jakarta.validation.Valid;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ClientValidationServiceImpl implements IClientValidationService {
 
+    private final ClientRepository clientRepository;
+    // Inject jobService or candidateService if needed for cross-entity validation,
+    // e.g., private final JobService jobService;
 
-    /**
-     * Validates business rules for creating a new client.
-     */
     @Override
     public void validateCreateClientRequest(CreateClientRequestDto dto) {
-
-        log.debug("Validating client creation: {}", dto.email());
+        log.debug("Validating client creation: email={}", dto.email());
 
         List<String> errors = new ArrayList<>();
 
-        // Example: Ensure client cannot be created with inactive status
-        // (Usually, new clients are PENDING_APPROVAL, but you can modify as needed)
-        // (If CreateClientDto contains status, uncomment below)
-        // if (dto.status() != null && dto.status() != ClientStatus.PENDING_APPROVAL) {
-        //     errors.add("New clients must be in PENDING_APPROVAL status");
-        // }
-
-        // Business validation: client email must be unique
-        // (This is handled by @UniqueConstraint, but you can add explicit DB check here if needed)
-
-        // Business validation: employee count must be at least 1 if present, not null
-        if (dto.employeeCount() != null && dto.employeeCount() < 1) {
-            errors.add("Employee count must be at least 1");
+        // Trim and validate email uniqueness
+        String email = dto.email() != null ? dto.email().trim() : null;
+        if (email == null || email.isBlank()) {
+            errors.add("Email is required.");
+        } else if (clientRepository.existsByEmailIgnoreCase(email)) {
+            errors.add("A client with this email already exists.");
         }
 
-        // Additional business logic can be added here
-        // E.g., validate industry, country, company name format, etc.
+        // Validate employee count
+        if (dto.employeeCount() != null && dto.employeeCount() < 1) {
+            errors.add("Employee count must be at least 1.");
+        }
 
-        // Raise exception if any business rule is violated
+        // Additional business validations
+        // Example: validate companyName or industry format if necessary
+        if (dto.companyName() == null || dto.companyName().isBlank()) {
+            errors.add("Company name is required.");
+        }
+
+        // status validation if status is present in DTO
+        // e.g. enforce new clients start with PENDING_APPROVAL or equivalent
+
         if (!errors.isEmpty()) {
             log.warn("Client creation validation failed: {}", errors);
-            throw new ClientValidationException("Client validation failed", errors);
+            throw new BusinessValidationException("Client creation validation failed", errors);
         }
-        log.info("Client creation validation passed: {}", dto.email());
+
+        log.info("Client creation validation passed for email: {}", email);
     }
 
-    /**
-     * Validates business rules for updating an existing client.
-     */
     @Override
     public void validateUpdateClientRequest(UUID clientId, UpdateClientRequestDto dto) {
         log.debug("Validating update for client: {}", clientId);
+
         List<String> errors = new ArrayList<>();
 
-        // Business validation: employee count must be at least 1 if present, not null
-        if (dto.employeeCount() != null && dto.employeeCount() < 1) {
-            errors.add("Employee count must be at least 1");
+        // Check the client exists (defensive)
+        if (!clientRepository.existsById(clientId)) {
+            log.warn("Client not found for update, id={}", clientId);
+            throw new ResourceNotFoundException("Client", "id", clientId.toString());
         }
 
-        // Additional business logic can be added here
-        // E.g., validate industry, country, company name format, etc.
+        // Trim and validate email uniqueness if email is modifiable in update DTO (adjust if applicable)
+//        if (dto.email() != null) {
+//            String email = dto.email().trim();
+//            if (clientRepository.existsByEmailIgnoreCase(email)) {
+//                // Make sure email does not belong to another client
+//                var existing = clientRepository.findByEmailIgnoreCase(email);
+//                if (existing.isPresent() && !existing.get().getId().equals(clientId)) {
+//                    errors.add("Another client with this email already exists.");
+//                }
+//            }
+//        }
 
-        // Raise exception if any business rule is violated
+        // Validate employee count
+        if (dto.employeeCount() != null && dto.employeeCount() < 1) {
+            errors.add("Employee count must be at least 1.");
+        }
+
+        // Add other necessary update validations here
+
         if (!errors.isEmpty()) {
             log.warn("Client update validation failed for client {}: {}", clientId, errors);
-            throw new ClientValidationException("Client update validation failed", errors);
+            throw new BusinessValidationException("Client update validation failed", errors);
         }
-        log.info("Client update validation passed: {}", clientId);
+
+        log.info("Client update validation passed for client: {}", clientId);
     }
 
     /**
-     * Validates business rules for client status transition.
-     * E.g., "Suspended" clients cannot directly become "Active"; only "Pending Approval" can become "Active".
+     * Optional: Adds validation support for PartialUpdateClientRequestDto
      */
+    public void validatePartialUpdateClientRequest(UUID clientId, PartialUpdateClientRequestDto dto) {
+        log.debug("Validating partial update for client: {}", clientId);
+
+        List<String> errors = new ArrayList<>();
+
+        if (!clientRepository.existsById(clientId)) {
+            log.warn("Client not found for partial update: {}", clientId);
+            throw new ResourceNotFoundException("Client", "id", clientId.toString());
+        }
+
+        // Example: email uniqueness if email is set in partial update
+//        if (dto.email() != null) {
+//            String email = dto.email().trim();
+//            var existing = clientRepository.findByEmailIgnoreCase(email);
+//            if (existing.isPresent() && !existing.get().getId().equals(clientId)) {
+//                errors.add("Another client with this email already exists.");
+//            }
+//        }
+
+        if (dto.employeeCount() != null && dto.employeeCount() < 1) {
+            errors.add("Employee count must be at least 1.");
+        }
+
+        if (!errors.isEmpty()) {
+            log.warn("Client partial update validation failed for client {}: {}", clientId, errors);
+            throw new BusinessValidationException("Client partial update validation failed", errors);
+        }
+
+        log.info("Client partial update validation passed for client: {}", clientId);
+    }
+
     @Override
     public void validateStatusTransition(Client client, ClientStatus newStatus) {
         log.debug("Validating client status transition from {} to {} for client {}",
                 client.getStatus(), newStatus, client.getId());
 
         ClientStatus currentStatus = client.getStatus();
-        boolean isValidTransition = false;
 
-        // Define your business rules for valid status transitions here
-        if (currentStatus == ClientStatus.PENDING_APPROVAL && newStatus == ClientStatus.ACTIVE) {
-            isValidTransition = true;
-        } else if (
-                (currentStatus == ClientStatus.ACTIVE && newStatus == ClientStatus.INACTIVE) ||
-                        (currentStatus == ClientStatus.ACTIVE && newStatus == ClientStatus.SUSPENDED) ||
-                        (currentStatus == ClientStatus.INACTIVE && newStatus == ClientStatus.ACTIVE) ||
-                        (currentStatus == ClientStatus.SUSPENDED && newStatus == ClientStatus.ACTIVE)
-        ) {
-            isValidTransition = true;
-        }
-        // Add more valid transition rules as needed
+        Map<ClientStatus, Set<ClientStatus>> validTransitions = Map.of(
+                ClientStatus.PENDING_APPROVAL, Set.of(ClientStatus.ACTIVE, ClientStatus.SUSPENDED),
+                ClientStatus.ACTIVE, Set.of(ClientStatus.INACTIVE, ClientStatus.SUSPENDED),
+                ClientStatus.INACTIVE, Set.of(ClientStatus.ACTIVE),
+                ClientStatus.SUSPENDED, Set.of(ClientStatus.ACTIVE)
+        );
+
+        boolean isValidTransition = validTransitions.getOrDefault(currentStatus, Set.of()).contains(newStatus);
 
         if (!isValidTransition) {
-            String message = String.format("Invalid status transition from %s to %s", currentStatus, newStatus);
+            String message = String.format("Invalid client status transition from '%s' to '%s'", currentStatus, newStatus);
             log.warn("Status transition validation failed for client {}: {}", client.getId(), message);
-            throw new ClientValidationException("Invalid status transition", List.of(message));
+            throw new BusinessValidationException("Invalid status transition", List.of(message));
         }
-        log.info("Status transition validation passed for client {} to {}", client.getId(), newStatus);
+
+        log.info("Client status transition validation passed for client {} to status {}", client.getId(), newStatus);
     }
 
-    /**
-     * Validates business rules for client deletion.
-     * E.g., active clients with jobs/candidates cannot be deleted.
-     */
     @Override
     public void validateClientDeletion(Client client) {
         log.debug("Validating deletion for client: {}", client.getId());
+
         List<String> errors = new ArrayList<>();
 
-        // Business rule: cannot delete client that is ACTIVE (or add your own logic)
         if (client.getStatus() == ClientStatus.ACTIVE) {
-            errors.add("Active clients cannot be deleted");
+            errors.add("Cannot delete an active client.");
         }
 
-        // Business rule: cannot delete client with jobs (would need reference to job-service, so consider this as a placeholder)
-        // if (jobService.countJobsByClientId(client.getId()) > 0) {
-        //     errors.add("Client with associated jobs cannot be deleted");
+        // Placeholder: check if client has associated jobs
+        // long jobCount = jobService.countJobsByClientId(client.getId());
+        // if (jobCount > 0) {
+        //     errors.add("Cannot delete client with associated jobs.");
         // }
 
-        // Add your own business rules as needed
-
-        // Raise exception if any business rule is violated
         if (!errors.isEmpty()) {
             log.warn("Client deletion validation failed for client {}: {}", client.getId(), errors);
-            throw new ClientValidationException("Client deletion validation failed", errors);
+            throw new BusinessValidationException("Client deletion validation failed", errors);
         }
-        log.info("Client deletion validation passed: {}", client.getId());
+
+        log.info("Client deletion validation passed for client: {}", client.getId());
     }
 }
+

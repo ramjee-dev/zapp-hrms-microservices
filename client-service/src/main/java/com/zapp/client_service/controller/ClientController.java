@@ -33,67 +33,76 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/clients", produces = MediaType.APPLICATION_JSON_VALUE)
-@RequiredArgsConstructor@Validated@Slf4j
-@Tag(name = "Client Management",description = "APIs for managing ZAPP HRMS Clients")
+@RequiredArgsConstructor
+@Validated
+@Slf4j
+@Tag(name = "Client Management", description = "APIs for managing ZAPP HRMS Clients")
 public class ClientController {
 
     private final IClientService clientService;
 
     @PostMapping
-//    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')") // Uncomment to enable security
     @Operation(summary = "Create a new client", description = "Creates a new client (Admin only)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Client created successfully",
                     content = @Content(schema = @Schema(implementation = ClientResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "Invalid client data",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
     public ResponseEntity<ClientResponseDto> createClient(
             @Valid @RequestBody CreateClientRequestDto createClientDto) {
 
-        log.info("Received request to create client: {}", createClientDto.companyName());
+        log.info("Received request to create client: companyName='{}', email='{}'",
+                createClientDto.companyName(), createClientDto.email());
 
         ClientResponseDto createdClient = clientService.createClient(createClientDto);
 
         URI location = URI.create("/api/v1/clients/" + createdClient.id());
+
         return ResponseEntity.created(location).body(createdClient);
     }
 
     @GetMapping("/{id}")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'BD', 'TAT')")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'BD', 'TAT')") // Uncomment for access control
     @Operation(summary = "Get client by ID", description = "Retrieves a specific client by its ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Client found",
                     content = @Content(schema = @Schema(implementation = ClientResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Client not found",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
     public ResponseEntity<ClientResponseDto> getClientById(
-            @Parameter(description = "Client ID") @PathVariable UUID id) {
+            @Parameter(description = "Client ID") @PathVariable("id") UUID clientId) {
 
-        log.debug("Received request to get client with id: {}", id);
+        log.debug("Received request to get client with id: {}", clientId);
 
-        ClientResponseDto client = clientService.fetchClientById(id);
+        ClientResponseDto client = clientService.fetchClientById(clientId);
         return ResponseEntity.ok(client);
     }
 
     @GetMapping
-//    @PreAuthorize("hasAnyRole('ADMIN', 'BD', 'TAT')")
-    @Operation(summary = "Get all Clients with pagination and filtering",
-            description = "Retrieves all Clients with support for pagination, sorting, and filtering")
+    // @PreAuthorize("hasAnyRole('ADMIN', 'BD', 'TAT')")
+    @Operation(summary = "Get all clients with pagination and filtering",
+            description = "Retrieves all clients with support for pagination, sorting, and filtering")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Clients retrieved successfully",
                     content = @Content(schema = @Schema(implementation = PagedClientResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
     public ResponseEntity<PagedClientResponseDto> getAllClients(
-            @Valid @ParameterObject
-            @ModelAttribute ClientPageRequestDto requestDto) {
+            @Valid @ParameterObject @ModelAttribute ClientPageRequestDto requestDto) {
 
         log.debug("Received request to get all clients with filters: {}", requestDto);
 
@@ -102,15 +111,17 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update client", description = "Updates an existing client completely (Admin only)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Client updated successfully",
                     content = @Content(schema = @Schema(implementation = ClientResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Client not found",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid Client data",
+            @ApiResponse(responseCode = "400", description = "Invalid client data",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
@@ -125,30 +136,32 @@ public class ClientController {
     }
 
     @PatchMapping("/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Partially Update client", description = "Updates specific fields of an existing Client")
+    // @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Partially update client", description = "Updates specific fields of an existing client")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Client Partially updated successfully",
+            @ApiResponse(responseCode = "200", description = "Client partially updated successfully",
                     content = @Content(schema = @Schema(implementation = ClientResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "Client not found",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid Client data",
+            @ApiResponse(responseCode = "400", description = "Invalid client data",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
     public ResponseEntity<ClientResponseDto> partiallyUpdateClient(
             @Parameter(description = "Client ID") @PathVariable("id") UUID clientId,
-            @Valid @RequestBody PartialUpdateClientRequestDto updateClientDto) {
+            @Valid @RequestBody PartialUpdateClientRequestDto partialUpdateClientDto) {
 
         log.info("Received request to partially update client with id: {}", clientId);
 
-        ClientResponseDto updatedClient = clientService.partialUpdateClient(clientId, updateClientDto);
+        ClientResponseDto updatedClient = clientService.partialUpdateClient(clientId, partialUpdateClientDto);
         return ResponseEntity.ok(updatedClient);
     }
 
     @PatchMapping("/{id}/status")
-//    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Change client status", description = "Changes the status of a client (Admin only)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Client status changed successfully",
@@ -157,27 +170,30 @@ public class ClientController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
             @ApiResponse(responseCode = "400", description = "Invalid status transition",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
-
     })
     public ResponseEntity<ClientResponseDto> changeClientStatus(
-            @Parameter(description = "Client ID") @PathVariable UUID id,
+            @Parameter(description = "Client ID") @PathVariable("id") UUID clientId,
             @Parameter(description = "New client status") @RequestParam ClientStatus status) {
 
-        log.info("Received request to change status of client {} to {}", id, status);
+        log.info("Received request to change status of client {} to {}", clientId, status);
 
-        ClientResponseDto updatedClient = clientService.changeClientStatus(id, status);
+        ClientResponseDto updatedClient = clientService.changeClientStatus(clientId, status);
         return ResponseEntity.ok(updatedClient);
     }
 
     @DeleteMapping("/{id}")
-//    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete client", description = "Deletes a client permanently (Admin only)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Client deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Client not found",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     })
@@ -189,6 +205,6 @@ public class ClientController {
         clientService.deleteClient(clientId);
         return ResponseEntity.noContent().build();
     }
-
 }
+
 

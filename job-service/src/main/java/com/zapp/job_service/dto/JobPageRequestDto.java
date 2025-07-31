@@ -32,7 +32,7 @@ public record JobPageRequestDto(
         @Size(max = 255, message = "Title must be at most 255 characters")
         String title
 ) {
-    // Compact constructor for null/default safety and trimming input
+        // Compact constructor for null/default safety and trimming input
     public JobPageRequestDto {
         // Enforce defaults
         page = (page < 0) ? 0 : page;

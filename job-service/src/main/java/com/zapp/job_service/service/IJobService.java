@@ -7,7 +7,6 @@ import java.util.UUID;
 
 public interface IJobService {
 
-
     JobResponseDto createJob(CreateJobRequestDto dto);
 
     JobResponseDto fetchJobById(UUID jobId);
@@ -22,7 +21,7 @@ public interface IJobService {
 
     void deleteJob(UUID jobId);
 
-    boolean updateCommunicationStatus(Long jobId);
+    boolean updateCommunicationStatus(UUID jobId);
 }
 
 

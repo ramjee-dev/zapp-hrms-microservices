@@ -36,75 +36,32 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     @Transactional
-    public JobResponseDto createJob(CreateJobRequestDto createJobRequestDto) {
-
-        log.info("Creating new job for client: {}", createJobRequestDto.clientId());
-
-        validationService.validateCreateJobRequest(createJobRequestDto);
-
-        Job job = mappingService.toEntity(createJobRequestDto);
-        Job savedJob = jobRepository.save(job);
-
-        log.info("Successfully created job with id: {}", savedJob.getId());
-
-        sendCommunication(savedJob);
-
-        return mappingService.toResponseDto(savedJob);
-
-
-        // 1. Validate client existence via Feign
-//        try {
-//            clientFeignClient.getClientById(createJobDto.clientId());
-//        } catch (FeignException.NotFound ex) {
-//            throw new ResourceNotFoundException("Client","ClientId",dto.getClientId()+"");
-//        }
-
-//        // 2. Check for existing job with same title for the same client
-//        Optional<Job> existingJob = jobRepository.findByClientIdAndTitle(createJobDto.getClientId(), dto.getTitle());
-//        if (existingJob.isPresent()) {
-//            throw new JobAlreadyExistsException("A job with title '" + dto.getTitle() +
-//                    "' already exists for client ID " + dto.getClientId());
-//        }
+    public JobResponseDto createJob(CreateJobRequestDto dto) {
+        log.info("Creating new job with title '{}' for client '{}'", dto.title(), dto.clientId());
+        validationService.validateCreateJobRequest(dto);
+        Job job = mappingService.toEntity(dto);
+        Job saved = jobRepository.save(job);
+        log.info("Created job with id '{}'", saved.getId());
+        return mappingService.toResponseDto(saved);
     }
 
     private void sendCommunication(Job job){
-
         JobCreatedEvent jobCreatedEvent = new JobCreatedEvent(job.getId(), job.getTitle(), job.getClientId()+"","anonymous",job.getCreatedAt()+"", Arrays.asList("ADMIN","DB"));
         log.info("Sending communication request for the details: {}",jobCreatedEvent);
         boolean send = streamBridge.send("sendCommunication-out-0", jobCreatedEvent);
         log.info("Is the communication request successfully triggered ? : {}",send);
-
     }
-
-//    @Override
-//    public List<JobResponseDTO> getAllJobs(Optional<Long> clientId, Optional<Job.JobStatus> status) {
-//        List<Job> jobs;
-//
-//        if (clientId.isPresent() && status.isPresent()) {
-//            jobs = jobRepository.findByClientIdAndStatus(clientId.get(), status.get());
-//        } else if (clientId.isPresent()) {
-//            jobs = jobRepository.findByClientId(clientId.get());
-//        } else if (status.isPresent()) {
-//            jobs = jobRepository.findByStatus(status.get());
-//        } else {
-//            jobs = jobRepository.findAll();
-//        }
-//
-//        return jobs.stream()
-//                .map(jobMapper::toDTO)
-//                .collect(Collectors.toList());
-//    }
-
 
     @Override
     public JobResponseDto fetchJobById(UUID jobId) {
-
-        log.debug("Fetching job with id: {}", jobId);
-
-        Job job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new ResourceNotFoundException("Job","JobId",jobId+""));
-
+        log.debug("Fetching job by id '{}'", jobId);
+        Job job = findJobOrThrow(jobId);
         return mappingService.toResponseDto(job);
+    }
+
+    private Job findJobOrThrow(UUID jobId) {
+        return jobRepository.findById(jobId)
+                .orElseThrow(() -> new ResourceNotFoundException("Job", "jobId", jobId.toString()));
     }
 
     @Override
@@ -143,11 +100,7 @@ public class JobServiceImpl implements IJobService {
         log.info("Updating job with id: {}", jobId);
 
         validationService.validateUpdateJobRequest(jobId, updateJobRequestDto);
-
-        // if needed check for already exists exception
-
-        Job existingJob = jobRepository.findById(jobId)
-                .orElseThrow(() -> new ResourceNotFoundException("Job","JobId",jobId+""));
+        Job existingJob = findJobOrThrow(jobId);
 
         mappingService.updateEntity(existingJob, updateJobRequestDto);
 
@@ -164,8 +117,9 @@ public class JobServiceImpl implements IJobService {
 
         log.info("Partially updating job with id: {}", jobId);
 
-        Job existingJob = jobRepository.findById(jobId)
-                .orElseThrow(() -> new ResourceNotFoundException("Job","JobId",jobId+""));
+        validationService.validatePartialUpdateJobRequest(jobId,partialUpdateJobRequestDto);
+
+        Job existingJob = findJobOrThrow(jobId);
 
         mappingService.partialUpdateEntity(existingJob, partialUpdateJobRequestDto);
 
@@ -182,11 +136,9 @@ public class JobServiceImpl implements IJobService {
 
         log.info("Changing status of job {} to {}", jobId, status);
 
-        Job existingJob = jobRepository.findById(jobId)
-                .orElseThrow(() -> new ResourceNotFoundException("Job","JobId",jobId+""));
+        Job existingJob = findJobOrThrow(jobId);
 
         validationService.validateStatusTransition(existingJob,status);
-
         existingJob.setStatus(status);
         Job updatedJob = jobRepository.save(existingJob);
 
@@ -201,16 +153,16 @@ public class JobServiceImpl implements IJobService {
 
         log.info("Deleting job with id: {}", jobId);
 
-        Job job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new ResourceNotFoundException("Job","JobId",jobId+""));
+        Job existingJob = findJobOrThrow(jobId);
+        validationService.validateJobDeletion(existingJob);
 
-        jobRepository.delete(job);
+        jobRepository.delete(existingJob);
 
         log.info("Successfully deleted job with id: {}", jobId);
     }
 
     @Override
-    public boolean updateCommunicationStatus(Long jobId) {
+    public boolean updateCommunicationStatus(UUID jobId) {
         return false;
     }
 

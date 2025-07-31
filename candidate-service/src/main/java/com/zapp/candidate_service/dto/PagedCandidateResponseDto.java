@@ -1,4 +1,14 @@
 package com.zapp.candidate_service.dto;
 
-public record PagedCandidateResponseDto() {
-}
+import java.util.List;
+
+public record PagedCandidateResponseDto(
+        int pageNumber,
+        int totalPages,
+        long totalElements,
+        boolean isFirst,
+        boolean isLast,
+        boolean hasNext,
+        boolean hasPrevious,
+        List<CandidateResponseDto> data
+) {}

@@ -1,73 +1,54 @@
 package com.zapp.candidate_service.service.impl;
 
-import com.zapp.candidate_service.dto.CandidateAddedEvent;
-import com.zapp.candidate_service.dto.CandidateDto;
-import com.zapp.candidate_service.dto.CandidateFilter;
-import com.zapp.candidate_service.dto.CandidateStatusChangedEvent;
+import com.zapp.candidate_service.dto.*;
 import com.zapp.candidate_service.entity.Candidate;
+import com.zapp.candidate_service.enums.CandidateStatus;
 import com.zapp.candidate_service.exception.ResourceNotFoundException;
-import com.zapp.candidate_service.mapper.CandidateMapper;
 import com.zapp.candidate_service.repository.CandidateRepository;
+import com.zapp.candidate_service.service.ICandidateMappingService;
 import com.zapp.candidate_service.service.ICandidateService;
-import com.zapp.candidate_service.service.client.JobServiceFeignClient;
-import feign.FeignException;
+import com.zapp.candidate_service.service.ICandidateValidationService;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.errors.DuplicateResourceException;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
+@RequiredArgsConstructor@Slf4j
+@Transactional(readOnly = true)
 public class CandidateServiceImpl implements ICandidateService {
 
     private final CandidateRepository candidateRepository;
-    private final JobServiceFeignClient jobServiceFeignClient;
-    private final CandidateMapper candidateMapper;
+    private final ICandidateValidationService validationService;
+    private final ICandidateMappingService mappingService;
     private final StreamBridge streamBridge;
 
-    /**
-     * @param jobId - Input JobId
-     * @param dto - Input CandidateDto object
-     */
     @Override
-    public void addCandidateToJob(Long jobId, CandidateDto dto) {
+    @Transactional
+    public CandidateResponseDto createCandidate(CreateCandidateRequestDto dto) {
+        log.info("Creating candidate with email '{}', for job '{}'", dto.email(), dto.jobId());
 
-        // 1. Validate that the job exists (via job-service)
-        try {
-            jobServiceFeignClient.getJobById(jobId);
-        } catch (FeignException.NotFound ex) {
-            throw new ResourceNotFoundException("Job", "jobId", jobId+"");
-        }
+        validationService.validateCreateRequest(dto);
 
-        // Check for duplicate candidate for the same job
-        if (candidateRepository.existsByJobIdAndEmailIgnoreCase(jobId, dto.getEmail())) {
-            throw new DuplicateResourceException("Candidate with email already exists for this job");
-        }
+        Candidate candidate = mappingService.toEntity(dto);
+        Candidate saved = candidateRepository.save(candidate);
 
-        // 2. Map DTO to entity
-        Candidate candidate = CandidateMapper.mapToCandidate(dto, new Candidate());
-        candidate.setJobId(jobId);
-        candidate.setStatus(Candidate.Status.APPLIED);
-
-        // 3. Save the candidate to DB
-        Candidate savedCandidate = candidateRepository.save(candidate);
-        log.info("Candidate [{}] saved for Job Id [{}]", savedCandidate.getCandidateId(), jobId);
-
-        // 4. Fire event for asynchronous communication (Kafka)
-        publishCandidateAddedEvent(savedCandidate);
+        log.info("Candidate created successfully with id '{}'", saved.getId());
+        return mappingService.toResponseDto(saved);
     }
 
     private void publishCandidateAddedEvent(Candidate candidate) {
         CandidateAddedEvent event = new CandidateAddedEvent(
-                candidate.getCandidateId(),
+                candidate.getId(),
                 candidate.getFullName(),
                 candidate.getJobId() + "",
                 "default client name",
@@ -81,50 +62,105 @@ public class CandidateServiceImpl implements ICandidateService {
     }
 
     @Override
-    public Page<Candidate> getAllCandidates(Pageable pageable, CandidateFilter filter) {
-        Specification<Candidate> spec = buildSpecification(filter);
-        return candidateRepository.findAll(spec, pageable);
+    public CandidateResponseDto fetchCandidateById(UUID candidateId) {
+        log.debug("Fetching candidate with id '{}'", candidateId);
+
+        Candidate candidate = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate", "id", candidateId.toString()));
+
+        return mappingService.toResponseDto(candidate);
     }
 
     @Override
-    public CandidateDto getCandidateById(Long candidateId) {
-         candidateRepository.findById(candidateId)
-                .orElseThrow(() -> new ResourceNotFoundException("Candidate","CandidateId",candidateId+""));
-    }
+    public PagedCandidateResponseDto fetchAllCandidates(CandidatePageRequestDto pageRequestDto) {
+        log.debug("Fetching candidates with filters: {} (page: {}, size: {})",
+                pageRequestDto, pageRequestDto.page(), pageRequestDto.size());
 
-    @Override
-    public CandidateDto updateCandidate(Long id, CandidateDto dto) {
-
-        CandidateDto existing = getCandidateById(id);
-        existing.setFullName(dto.getFullName());
-        existing.setEmail(dto.getEmail());
-        existing.setPhone(dto.getPhone());
-        existing.setRemarks(dto.getRemarks());
-        return candidateRepository.save(existing);
-    }
-
-    @Override
-    public Candidate updateCandidateStatus(Long id, Candidate.Status newStatus) {
-        Candidate candidate = getCandidateById(id);
-
-        // 1. Update the status
-        candidate.setStatus(newStatus);
-
-        // 2. Update the communication map (VERY IMPORTANT)
-        Map<String, Boolean> commMap = candidate.getStatusCommunicationMap();
-        if (commMap == null) {
-            commMap = new HashMap<>();
+        // Parse and validate sort direction, default to DESC if invalid
+        Sort.Direction direction;
+        try {
+            direction = Sort.Direction.fromString(pageRequestDto.sortDir());
+        } catch (IllegalArgumentException e) {
+            direction = Sort.Direction.DESC;
+            log.warn("Invalid sort direction '{}', defaulting to DESC", pageRequestDto.sortDir());
         }
-        commMap.put(newStatus.name(), true); // e.g., SELECTED → true
-        candidate.setStatusCommunicationMap(commMap); // update the field
 
-        // 3. Save the updated entity
-        Candidate updated = candidateRepository.save(candidate);
+        Sort sort = Sort.by(direction, pageRequestDto.sortBy());
+        Pageable pageable = PageRequest.of(pageRequestDto.page(), pageRequestDto.size(), sort);
 
-        // 4. Send communication event
-        sendStatusChangedCommunication(updated);
+        // Assuming candidateRepository extends JpaSpecificationExecutor<Candidate> or has a custom query method
+        Page<Candidate> candidatePage = candidateRepository.findCandidatesWithFilters(
+                pageRequestDto.jobId(),
+                pageRequestDto.status(),
+                pageRequestDto.experienceLevel(),
+                pageRequestDto.skills(),
+                pageRequestDto.country(),
+                pageRequestDto.firstName(),
+                pageRequestDto.lastName(),
+                pageable
+        );
 
-        return updated;
+        return new PagedCandidateResponseDto(
+                candidatePage.getNumber(),
+                candidatePage.getTotalPages(),
+                candidatePage.getTotalElements(),
+                candidatePage.isFirst(),
+                candidatePage.isLast(),
+                candidatePage.hasNext(),
+                candidatePage.hasPrevious(),
+                mappingService.toResponseDtoList(candidatePage.getContent())
+        );
+    }
+
+    @Override
+    @Transactional
+    public CandidateResponseDto updateCandidate(UUID candidateId, UpdateCandidateRequestDto dto) {
+        log.info("Updating candidate with id '{}'", candidateId);
+
+        validationService.validateUpdateRequest(candidateId, dto);
+
+        Candidate existing = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate", "id", candidateId.toString()));
+
+        mappingService.updateEntity(existing, dto);
+        Candidate updated = candidateRepository.save(existing);
+
+        log.info("Candidate with id '{}' updated successfully", candidateId);
+        return mappingService.toResponseDto(updated);
+    }
+
+    @Override
+    @Transactional
+    public CandidateResponseDto partialUpdateCandidate(UUID candidateId, PartialUpdateCandidateRequestDto dto) {
+        log.info("Partially updating candidate with id '{}'", candidateId);
+
+        validationService.validatePartialUpdateRequest(candidateId, dto);
+
+        Candidate existing = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate", "id", candidateId.toString()));
+
+        mappingService.partialUpdateEntity(existing, dto);
+        Candidate updated = candidateRepository.save(existing);
+
+        log.info("Candidate with id '{}' partially updated successfully", candidateId);
+        return mappingService.toResponseDto(updated);
+    }
+
+    @Override
+    @Transactional
+    public CandidateResponseDto changeCandidateStatus(UUID candidateId, CandidateStatus newStatus) {
+        log.info("Changing status for candidate '{}' to '{}'", candidateId, newStatus);
+
+        Candidate existing = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate", "id", candidateId.toString()));
+
+        validationService.validateStatusTransition(existing, newStatus);
+
+        existing.setStatus(newStatus);
+        Candidate updated = candidateRepository.save(existing);
+
+        log.info("Status changed successfully for candidate '{}'", candidateId);
+        return mappingService.toResponseDto(updated);
     }
 
 
@@ -143,36 +179,47 @@ public class CandidateServiceImpl implements ICandidateService {
         boolean sent = streamBridge.send("sendCommunication-out-1", event);
         log.info("CandidateStatusChangedEvent sent? {}", sent);
     }
-
     @Override
-    public void deleteCandidate(Long id) {
-        if (!candidateRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Candidate not found with id " + id);
-        }
-        candidateRepository.deleteById(id);
+    @Transactional
+    public void deleteCandidate(UUID candidateId) {
+        log.info("Deleting candidate with id '{}'", candidateId);
+
+        Candidate candidate = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate", "id", candidateId.toString()));
+
+        validationService.validateDeletion(candidate);
+
+        candidateRepository.delete(candidate);
+
+        log.info("Candidate with id '{}' deleted successfully", candidateId);
     }
 
     @Override
-    public boolean updateCommunicationStatus(Long candidateId) {
-        boolean isUpdated = false;
-        if(candidateId!=null){
-            Candidate candidate = candidateRepository.findById(candidateId).orElseThrow(
-                    () -> new ResourceNotFoundException("Candidate","CandidateId",candidateId+""));
-            candidate.setCommunicationSw(true);
-            candidateRepository.save(candidate);
-            isUpdated = true;
-        }
-        return isUpdated;
+    public boolean updateCommunicationStatus(UUID candidateId) {
+        return false;
     }
 
+//    @Override
+//    public boolean updateCommunicationStatus(Long candidateId) {
+//        boolean isUpdated = false;
+//        if(candidateId!=null){
+//            Candidate candidate = candidateRepository.findById(candidateId).orElseThrow(
+//                    () -> new ResourceNotFoundException("Candidate","CandidateId",candidateId+""));
+//            candidate.setCommunicationSw(true);
+//            candidateRepository.save(candidate);
+//            isUpdated = true;
+//        }
+//        return isUpdated;
+//    }
+
     @Override
-    public boolean updateStatusCommunicationMap(Long id, String status) {
+    public boolean updateStatusCommunicationMap(UUID id, String status) {
         if (id == null || status == null || status.isBlank()) {
             return false;
         }
 
         Candidate candidate = candidateRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Candidate not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate","CandidateId",id+""));
 
         Map<String, Boolean> statusMap = candidate.getStatusCommunicationMap();
         if (statusMap == null) {

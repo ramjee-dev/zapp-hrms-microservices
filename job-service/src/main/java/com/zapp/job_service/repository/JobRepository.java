@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,16 +17,39 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface JobRepository extends JpaRepository<Job, UUID> {
+public interface JobRepository extends JpaRepository<Job, UUID>, JpaSpecificationExecutor<Job> {
 
-    List<Job> findByClientId(UUID clientId);
+    /**
+     * Finds all jobs for a given client.
+     * Consider adding Pageable for large result sets.
+     */
+    List<Job> findByClientId(UUID clientId);  // Consider Page<Job> + Pageable
 
-    List<Job> findByStatus(JobStatus status);
+    /**
+     * Finds all jobs with the given status.
+     * Consider adding Pageable for large result sets.
+     */
+    List<Job> findByStatus(JobStatus status);  // Consider Page<Job> + Pageable
 
-    List<Job> findByClientIdAndStatus(Long clientId, JobStatus status);
+    /**
+     * Finds jobs by client ID and status.
+     */
+    List<Job> findByClientIdAndStatus(UUID clientId, JobStatus status);  // consider pagination
 
-    Optional<Job> findByClientIdAndTitle(Long clientId,String title);
+    /**
+     * Finds a job by client ID and title (case insensitive).
+     */
+    Optional<Job> findByClientIdAndTitleIgnoreCase(UUID clientId, String title);
 
+    /**
+     * Checks if a job exists for given client ID and title (case insensitive).
+     */
+    boolean existsByClientIdAndTitleIgnoreCase(UUID clientId, String title);
+
+    /**
+     * Dynamic filtering of jobs with optional criteria.
+     * Supports pagination.
+     */
     @Query("SELECT j FROM Job j WHERE " +
             "(:clientId IS NULL OR j.clientId = :clientId) AND " +
             "(:status IS NULL OR j.status = :status) AND " +
@@ -38,6 +62,4 @@ public interface JobRepository extends JpaRepository<Job, UUID> {
                                   @Param("location") String location,
                                   @Param("title") String title,
                                   Pageable pageable);
-
 }
-

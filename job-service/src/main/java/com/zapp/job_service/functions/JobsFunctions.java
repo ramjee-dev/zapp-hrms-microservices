@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 @Configuration
@@ -12,7 +13,7 @@ import java.util.function.Consumer;
 public class JobsFunctions {
 
     @Bean
-    public Consumer<Long> updateCommunication(IJobService jobService){
+    public Consumer<UUID> updateCommunication(IJobService jobService){
         return jobId -> {
             log.info("updating communication status for Job with ID: {}",jobId);
             jobService.updateCommunicationStatus(jobId);

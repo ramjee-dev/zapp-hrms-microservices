@@ -20,24 +20,38 @@ import java.util.UUID;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, UUID> {
 
+    // Checks if a client exists with exact name (case-sensitive)
     boolean existsByName(String name);
 
+    // Checks if a client exists with exact email (case-sensitive)
     boolean existsByEmail(String email);
 
+    // Checks if a client exists with exact phone number (case-sensitive)
     boolean existsByPhoneNumber(String phoneNumber);
 
+    // Finds a client by name ignoring case, returns Optional
     @Query("SELECT c FROM Client c WHERE LOWER(c.name) = LOWER(:name)")
     Optional<Client> findByNameIgnoreCase(@Param("name") String name);
 
-    boolean existsByNameAndClientIdNot(String name,Long clientId);
+    // Checks if a client with given name exists excluding a specific client id (for update uniqueness)
+    boolean existsByNameAndIdNot(@Param("name") String name, @Param("id") UUID id);
 
-    @Query("SELECT c FROM Client c WHERE " +
-            "(:status IS NULL OR c.status = :status) AND " +
-            "(:clientType IS NULL OR c.clientType = :clientType) AND " +
-            "(:industry IS NULL OR LOWER(c.industry) LIKE LOWER(CONCAT('%', :industry, '%'))) AND " +
-            "(:country IS NULL OR LOWER(c.country) LIKE LOWER(CONCAT('%', :country, '%'))) AND " +
-            "(:companyName IS NULL OR LOWER(c.companyName) LIKE LOWER(CONCAT('%', :companyName, '%')))")
-    Page<Client> findClientsWithFilters(
+    // Checks if email exists ignoring case, for validation purposes
+    boolean existsByEmailIgnoreCase(String email);
+
+    // Fetch clients by status – if you expect large list, consider pagination for scalability
+    List<Client> findByStatus(ClientStatus status);
+
+    // Dynamic filtering by optional criteria with pagination support
+    @Query("""
+        SELECT c FROM Client c
+        WHERE (:status IS NULL OR c.status = :status)
+          AND (:clientType IS NULL OR c.clientType = :clientType)
+          AND (:industry IS NULL OR LOWER(c.industry) LIKE LOWER(CONCAT('%', :industry, '%')))
+          AND (:country IS NULL OR LOWER(c.country) LIKE LOWER(CONCAT('%', :country, '%')))
+          AND (:companyName IS NULL OR LOWER(c.companyName) LIKE LOWER(CONCAT('%', :companyName, '%')))
+        """)
+    Page<Client> findClientsByFilters(
             @Param("status") ClientStatus status,
             @Param("clientType") ClientType clientType,
             @Param("industry") String industry,
@@ -45,5 +59,4 @@ public interface ClientRepository extends JpaRepository<Client, UUID> {
             @Param("companyName") String companyName,
             Pageable pageable);
 
-    List<Client> findByStatus(ClientStatus status);
 }

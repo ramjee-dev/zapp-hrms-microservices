@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface ICandidateMappingService {
 
-    Candidate toEntity(CreateCandidateDto dto);
+    Candidate toEntity(CreateCandidateRequestDto dto);
 
-    void updateEntity(Candidate candidate, UpdateCandidateDto dto);
+    void updateEntity(Candidate existingCandidate, UpdateCandidateRequestDto dto);
 
-    void partialUpdateEntity(Candidate candidate, PartialUpdateCandidateDto dto);
+    void partialUpdateEntity(Candidate existingCandidate, PartialUpdateCandidateRequestDto dto);
 
     CandidateResponseDto toResponseDto(Candidate candidate);
 

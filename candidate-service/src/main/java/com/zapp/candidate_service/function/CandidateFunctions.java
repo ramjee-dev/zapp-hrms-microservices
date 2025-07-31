@@ -13,22 +13,22 @@ import java.util.function.Consumer;
 public class CandidateFunctions {
 
     // For Candidate Added Event → updates communicationSw = true
-    @Bean
-    public Consumer<Long> updateCommunication(ICandidateService candidateService) {
-        return candidateId -> {
-            log.info("✅ [Candidate Added] Updating communicationSw for Candidate ID: {}", candidateId);
-            candidateService.updateCommunicationStatus(candidateId);
-        };
-    }
+//    @Bean
+//    public Consumer<Long> updateCommunication(ICandidateService candidateService) {
+//        return candidateId -> {
+//            log.info("✅ [Candidate Added] Updating communicationSw for Candidate ID: {}", candidateId);
+//            candidateService.updateCommunicationStatus(candidateId);
+//        };
+//    }
 
     // For Candidate Status Change Event → updates statusCommunicationMap
-    @Bean
-    public Consumer<CandidateStatusAcknowledgedEvent> updateStatusCommunication(ICandidateService candidateService) {
-        return event -> {
-            log.info("✅ [Status Changed] Updating statusCommunicationMap for Candidate ID: {}, Status: {}",
-                    event.getCandidateId(), event.getStatus());
-            candidateService.updateStatusCommunicationMap(event.getCandidateId(), event.getStatus());
-        };
-    }
+//    @Bean
+//    public Consumer<CandidateStatusAcknowledgedEvent> updateStatusCommunication(ICandidateService candidateService) {
+//        return event -> {
+//            log.info("✅ [Status Changed] Updating statusCommunicationMap for Candidate ID: {}, Status: {}",
+//                    event.getCandidateId(), event.getStatus());
+//            candidateService.updateStatusCommunicationMap(event.getCandidateId(), event.getStatus());
+//        };
+//    }
 }
 

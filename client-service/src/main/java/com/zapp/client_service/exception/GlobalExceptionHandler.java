@@ -23,99 +23,88 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    private static final String BASE_PROBLEM_URI = "https://api.zapp-hrms.com/problems/";
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleClientNotFound(ResourceNotFoundException ex, WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_FOUND, ex.getMessage());
+        log.warn("Resource not found: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problemDetail.setTitle("Client Not Found");
-        problemDetail.setType(URI.create("https://api.zapp-hrms.com/problems/client-not-found"));
-        problemDetail.setProperty("timestamp", Instant.now());
-        problemDetail.setProperty("path", request.getDescription(false));
-
+        problemDetail.setType(URI.create(BASE_PROBLEM_URI + "client-not-found"));
+        enrichMetadata(problemDetail, request);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
 
-//    @ExceptionHandler(ClientAlreadyExistsException.class)
-//    public ResponseEntity<ErrorResponseDto> handleClientAlreadyExists(ClientAlreadyExistsException ex, HttpServletRequest request) {
-//        log.warn("Client already exists: clientName='{}', path='{}'", ex.getClientName(), request.getRequestURI());
-//        return buildErrorResponse(
-//                request.getRequestURI(),
-//                HttpStatus.CONFLICT,
-//                "Conflict",
-//                ex.getMessage(),
-//                null
-//        );
-//    }
-
-    @ExceptionHandler(ClientValidationException.class)
-    public ResponseEntity<ProblemDetail> handleClientValidation(ClientValidationException ex, WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST, ex.getMessage());
+    @ExceptionHandler(BusinessValidationException.class)
+    public ResponseEntity<ProblemDetail> handleClientValidation(BusinessValidationException ex, WebRequest request) {
+        log.warn("Client validation failed: {}", ex.getErrors());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         problemDetail.setTitle("Client Validation Failed");
-        problemDetail.setType(URI.create("https://api.zapp-hrms.com/problems/client-validation-failed"));
-        problemDetail.setProperty("timestamp", Instant.now());
-        problemDetail.setProperty("path", request.getDescription(false));
+        problemDetail.setType(URI.create(BASE_PROBLEM_URI + "client-validation-failed"));
+        enrichMetadata(problemDetail, request);
 
         if (ex.getErrors() != null && !ex.getErrors().isEmpty()) {
             problemDetail.setProperty("validationErrors", ex.getErrors());
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
+        return ResponseEntity.badRequest().body(problemDetail);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ProblemDetail> handleValidationExceptions(
-            MethodArgumentNotValidException ex, WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST, "Request validation failed");
+    public ResponseEntity<ProblemDetail> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
+        log.warn("Request validation failed: {} errors", ex.getBindingResult().getErrorCount());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Request validation failed");
         problemDetail.setTitle("Request Validation Failed");
-        problemDetail.setType(URI.create("https://api.zapp-hrms.com/problems/request-validation-failed"));
-        problemDetail.setProperty("timestamp", Instant.now());
-        problemDetail.setProperty("path", request.getDescription(false));
+        problemDetail.setType(URI.create(BASE_PROBLEM_URI + "request-validation-failed"));
+        enrichMetadata(problemDetail, request);
 
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            String fieldName = (error instanceof FieldError fe) ? fe.getField() : error.getObjectName();
+            errors.put(fieldName, error.getDefaultMessage());
         });
         problemDetail.setProperty("fieldErrors", errors);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
+        return ResponseEntity.badRequest().body(problemDetail);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ProblemDetail> handleConstraintViolationExceptions(
-            ConstraintViolationException ex, WebRequest request) {
-
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST, "Constraint violation");
+    public ResponseEntity<ProblemDetail> handleConstraintViolationExceptions(ConstraintViolationException ex, WebRequest request) {
+        log.warn("Constraint violation: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Constraint violation");
         problemDetail.setTitle("Request Constraint Violation");
-        problemDetail.setType(URI.create("https://api.zapp-hrms.com/problems/constraint-violation"));
-        problemDetail.setProperty("timestamp", Instant.now());
-        problemDetail.setProperty("path", request.getDescription(false));
+        problemDetail.setType(URI.create(BASE_PROBLEM_URI + "constraint-violation"));
+        enrichMetadata(problemDetail, request);
 
-        // Collect all constraint violations, typically for param/path validations
         Map<String, String> errors = new HashMap<>();
         ex.getConstraintViolations().forEach(violation -> {
             String fieldPath = violation.getPropertyPath().toString();
-            String errorMessage = violation.getMessage();
-            errors.put(fieldPath, errorMessage);
+            errors.put(fieldPath, violation.getMessage());
         });
         problemDetail.setProperty("fieldErrors", errors);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
+        return ResponseEntity.badRequest().body(problemDetail);
     }
+
+    // Optionally handle other domain exceptions here...
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleGenericException(Exception ex, WebRequest request) {
+        log.error("Internal server error: {}", ex.getMessage(), ex);
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
         problemDetail.setTitle("Internal Server Error");
-        problemDetail.setType(URI.create("https://api.zapp-hrms.com/problems/internal-server-error"));
-        problemDetail.setProperty("timestamp", Instant.now());
-        problemDetail.setProperty("path", request.getDescription(false));
-
+        problemDetail.setType(URI.create(BASE_PROBLEM_URI + "internal-server-error"));
+        enrichMetadata(problemDetail, request);
+        // Optionally include traceId/errorId if available
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
+    }
+
+    /** Add metadata to all problems (timestamp, path, optionals like traceId) */
+    private void enrichMetadata(ProblemDetail pd, WebRequest request) {
+        pd.setProperty("timestamp", Instant.now());
+        pd.setProperty("path", request.getDescription(false));
+        // Optional: If using MDC/trace
+        // pd.setProperty("traceId", MDC.get("traceId"));
     }
 }

@@ -39,7 +39,7 @@ public record CreateClientRequestDto(
         String website,
 
         @NotNull(message = "Client type is required")
-        ClientType clientType,
+        ClientType clientType, // need to put validation for clientType
 
         @Size(max = 1000, message = "Description must not exceed 1000 characters")
         String description,

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -23,7 +24,6 @@ public class JobMappingServiceImpl implements IJobMappingService {
 
         log.debug("Mapping CreateJobRequestDto to Job entity, title: {}, clientId: {}",
                 dto.title(), dto.clientId());
-
         Job job = new Job();
         job.setTitle(dto.title());
         job.setDescription(dto.description());
@@ -36,10 +36,9 @@ public class JobMappingServiceImpl implements IJobMappingService {
         job.setSalaryRange(dto.salaryRange());
         job.setEmploymentType(dto.employmentType());
         job.setPositionsAvailable(dto.positionsAvailable());
-
+        // need to set default status
         log.info("Created new Job entity, title: {}, clientId: {}",
                 job.getTitle(), job.getClientId());
-
         return job;
     }
 
@@ -48,7 +47,8 @@ public class JobMappingServiceImpl implements IJobMappingService {
 
         log.debug("Updating Job entity, id: {}, title: {}, clientId: {}",
                 job.getId(), dto.title(), job.getClientId());
-
+// omit field that are immutable after job creation like clientId
+// also omit field that have dedicated work flow like status
         job.setTitle(dto.title());
         job.setDescription(dto.description());
         job.setLocation(dto.location());
@@ -67,64 +67,28 @@ public class JobMappingServiceImpl implements IJobMappingService {
 
     @Override
     public void partialUpdateEntity(Job job, PartialUpdateJobRequestDto dto) {
-        log.debug("Performing partial update on Job entity, id: {}", job.getId());
 
-        if (dto.title() != null) {
-            log.debug("Updating title from {} to {}",
-                    job.getTitle(), dto.title());
-            job.setTitle(dto.title());
-        }
-        if (dto.description() != null) {
-            log.debug("Updating description");
-            job.setDescription(dto.description());
-        }
-        if (dto.location() != null) {
-            log.debug("Updating location from {} to {}",
-                    job.getLocation(), dto.location());
-            job.setLocation(dto.location());
-        }
-        if (dto.department() != null) {
-            log.debug("Updating department from {} to {}",
-                    job.getDepartment(), dto.department());
-            job.setDepartment(dto.department());
-        }
-        if (dto.priority() != null) {
-            log.debug("Updating priority from {} to {}",
-                    job.getPriority(), dto.priority());
-            job.setPriority(dto.priority());
-        }
-        if (dto.requiredSkills() != null) {
-            log.debug("Updating required skills");
-            job.setRequiredSkills(dto.requiredSkills());
-        }
-        if (dto.experienceRequired() != null) {
-            log.debug("Updating experience required from {} to {}",
-                    job.getExperienceRequired(), dto.experienceRequired());
-            job.setExperienceRequired(dto.experienceRequired());
-        }
-        if (dto.salaryRange() != null) {
-            log.debug("Updating salary range from {} to {}",
-                    job.getSalaryRange(), dto.salaryRange());
-            job.setSalaryRange(dto.salaryRange());
-        }
-        if (dto.employmentType() != null) {
-            log.debug("Updating employment type from {} to {}",
-                    job.getEmploymentType(), dto.employmentType());
-            job.setEmploymentType(dto.employmentType());
-        }
-        if (dto.positionsAvailable() != null) {
-            log.debug("Updating positions available from {} to {}",
-                    job.getPositionsAvailable(), dto.positionsAvailable());
-            job.setPositionsAvailable(dto.positionsAvailable());
-        }
+        log.debug("Starting partial update for Job entity with id: {}", job.getId());
+// omit field that are immutable after job creation like clientId
+// also omit field that have dedicated work flow like status
+        if (dto.title() != null) job.setTitle(dto.title());
+        if (dto.description() != null) job.setDescription(dto.description());
+        if (dto.location() != null) job.setLocation(dto.location());
+        if (dto.department() != null) job.setDepartment(dto.department());
+        if (dto.priority() != null) job.setPriority(dto.priority());
+        if (dto.requiredSkills() != null) job.setRequiredSkills(dto.requiredSkills());
+        if (dto.experienceRequired() != null) job.setExperienceRequired(dto.experienceRequired());
+        if (dto.salaryRange() != null) job.setSalaryRange(dto.salaryRange());
+        if (dto.employmentType() != null) job.setEmploymentType(dto.employmentType());
+        if (dto.positionsAvailable() != null) job.setPositionsAvailable(dto.positionsAvailable());
 
-        log.info("Partially updated Job entity, id: {}", job.getId());
+        log.info("Partial update completed for Job entity with id: {}", job.getId());
     }
 
     @Override
     public JobResponseDto toResponseDto(Job job) {
 
-        log.debug("Mapping Job entity to JobResponseDto, id: {}", job.getId());
+        log.trace("Mapping Job entity to JobResponseDto, id: {}", job.getId());
 
         return new JobResponseDto(
                 job.getId(),
@@ -150,8 +114,12 @@ public class JobMappingServiceImpl implements IJobMappingService {
     @Override
     public List<JobResponseDto> toResponseDtoList(List<Job> jobs) {
 
-        log.debug("Converting list of {} Job entities to JobResponseDto list", jobs.size());
-
-        return jobs.stream().map(this::toResponseDto).toList();
+        int count = (jobs == null) ? 0 : jobs.size();
+        log.trace("Mapping list of {} Job entities to JobResponseDto list", count);
+        if (jobs == null) return List.of();
+        return jobs.stream()
+                .filter(Objects::nonNull)
+                .map(this::toResponseDto)
+                .toList();
     }
 }

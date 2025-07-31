@@ -5,38 +5,52 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a03bcff3-eb89-4fa4-abcb-6c4678f153c8" name="Changes" comment="implemented User-service APIs">
+      <change afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/CreateCandidateRequestDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/PartialUpdateCandidateRequestDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/UpdateCandidateRequestDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/BusinessValidationException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/BusinessValidationException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/controller/CandidateController.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/controller/CandidateController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/CandidateDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/CandidatePageRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/CandidatePageRequestDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/CandidateResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/CandidateResponseDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/CreateCandidateDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/ErrorResponseDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/PagedCandidateResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/PagedCandidateResponseDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/PartialUpdateCandidateDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/ResponseDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/dto/UpdateCandidateDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/entity/BaseEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/entity/BaseEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/entity/Candidate.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/entity/Candidate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/exception/DuplicateResourceException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/exception/ResourceNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/exception/ResourceNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/function/CandidateFunctions.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/function/CandidateFunctions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/mapper/CandidateMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/mapper/CandidateMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/repository/CandidateRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/repository/CandidateRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/ICandidateMappingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/ICandidateMappingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/ICandidateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/ICandidateService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/ICandidateValidationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/ICandidateValidationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/impl/CandidateServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/candidate-service/src/main/java/com/zapp/candidate_service/service/impl/CandidateServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/controller/ClientController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/controller/ClientController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientCreateRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientPageRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientPageResponseDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientPartialUpdateRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientResponseDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ClientUpdateRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ErrorResponseDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/ResponseDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/entity/BaseEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/entity/BaseEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/entity/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/entity/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/BusinessValidationException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/CreateClientRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/dto/CreateClientRequestDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/ClientAlreadyExistsException.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/ClientAlreadyExistsException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/ClientValidationException.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/mapper/ClientMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/mapper/ClientMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/ResourceNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/exception/ResourceNotFoundException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/repository/ClientRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/repository/ClientRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/IClientMappingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/IClientMappingService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/IClientService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/IClientService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/IClientValidationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/IClientValidationService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/impl/ClientMappingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/impl/ClientMappingServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/impl/ClientServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/impl/ClientServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/impl/ClientValidationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/client-service/src/main/java/com/zapp/client_service/service/impl/ClientValidationServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/controller/JobController.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/controller/JobController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/CreateJobDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/CreateJobRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/ErrorResponseDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/JobDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/PartialUpdateJobDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/PartialUpdateJobRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/UpdateJobDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/UpdateJobRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/entity/BaseEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/entity/BaseEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/CreateJobRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/CreateJobRequestDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/JobPageRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/dto/JobPageRequestDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/BusinessRuleViolationException.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/mapper/JobMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/mapper/JobMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobMappingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobMappingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/JobAlreadyExistsException.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/JobAlreadyExistsException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/JobValidationException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/ResourceNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/exception/ResourceNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/functions/JobsFunctions.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/functions/JobsFunctions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/repository/JobRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/repository/JobRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobService.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobValidationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/IJobValidationService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/impl/JobMappingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/job-service/src/main/java/com/zapp/job_service/service/impl/JobMappingServiceImpl.java" afterDir="false" />
@@ -53,8 +67,8 @@
       <list>
         <option value="package-info" />
         <option value="Interface" />
-        <option value="Enum" />
         <option value="Record" />
+        <option value="Enum" />
         <option value="Class" />
       </list>
     </option>
