@@ -4,13 +4,10 @@ import com.zapp.client_service.dto.*;
 import com.zapp.client_service.entity.Client;
 import com.zapp.client_service.service.IClientMappingService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

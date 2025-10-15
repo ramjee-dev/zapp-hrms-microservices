@@ -12,12 +12,12 @@ public interface IJobValidationService {
 
     void validateCreateJobRequest(CreateJobRequestDto dto);
 
-    void validateUpdateJobRequest(UUID jobId, UpdateJobRequestDto dto);
+    void validateUpdateJobRequest(Job existingJob, UpdateJobRequestDto dto);
 
-    void validatePartialUpdateJobRequest(UUID jobId, PartialUpdateJobRequestDto dto);
+    void validatePartialUpdateJobRequest(Job existingJob, PartialUpdateJobRequestDto dto);
 
-    void validateStatusTransition(Job job, JobStatus newStatus);
+    void validateStatusTransition(Job existingJob, JobStatus newStatus);
 
-    void validateJobDeletion(Job job);
+    void validateJobDeletion(Job existingJob);
 
 }

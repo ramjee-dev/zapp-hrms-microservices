@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="eureka-service" />
+        <module name="configserver" />
         <module name="common" />
       </profile>
       <profile name="Annotation profile for user-service" enabled="true">
@@ -17,16 +18,24 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
-        <module name="job-service" />
-        <module name="candidate-service" />
         <module name="user-service" />
         <module name="message-service" />
         <module name="gateway-service" />
+      </profile>
+      <profile name="Annotation profile for job-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+        </processorPath>
+        <module name="job-service" />
+        <module name="candidate-service" />
         <module name="client-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="zapp-bom" target="21" />
+      <module name="zapp-bom" target="23" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -34,6 +43,7 @@
       <module name="candidate-service" options="" />
       <module name="client-service" options="" />
       <module name="common" options="" />
+      <module name="configserver" options="" />
       <module name="eureka-service" options="" />
       <module name="gateway-service" options="" />
       <module name="job-service" options="" />

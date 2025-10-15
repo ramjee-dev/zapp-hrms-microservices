@@ -35,7 +35,9 @@ public class CandidateServiceImpl implements ICandidateService {
     @Override
     @Transactional
     public CandidateResponseDto createCandidate(CreateCandidateRequestDto dto) {
-        log.info("Creating candidate with email '{}', for job '{}'", dto.email(), dto.jobId());
+        // Normalize and mask email for safe logging
+        final String safeEmail = (dto.email() == null) ? "" : dto.email().trim();
+        log.info("Creating candidate for email='{}', job='{}'", maskEmail(safeEmail), dto.jobId());
 
         validationService.validateCreateRequest(dto);
 
@@ -47,22 +49,27 @@ public class CandidateServiceImpl implements ICandidateService {
     }
 
     private void publishCandidateAddedEvent(Candidate candidate) {
+
         CandidateAddedEvent event = new CandidateAddedEvent(
                 candidate.getId(),
-                candidate.getFullName(),
+                candidate.getFirstName(),
                 candidate.getJobId() + "",
                 "default client name",
                 "Added By TAT user",
                 candidate.getCreatedAt() + "",
                 Arrays.asList("ADMIN", "TAT")
         );
+
         log.info("Sending CandidateAddedEvent: {}", event);
+
         boolean sent = streamBridge.send("sendCommunication-out-0", event);
+
         log.info("Is the communication request successfully triggered ? : {}",sent);
     }
 
     @Override
     public CandidateResponseDto fetchCandidateById(UUID candidateId) {
+
         log.debug("Fetching candidate with id '{}'", candidateId);
 
         Candidate candidate = candidateRepository.findById(candidateId)
@@ -76,16 +83,9 @@ public class CandidateServiceImpl implements ICandidateService {
         log.debug("Fetching candidates with filters: {} (page: {}, size: {})",
                 pageRequestDto, pageRequestDto.page(), pageRequestDto.size());
 
-        // Parse and validate sort direction, default to DESC if invalid
-        Sort.Direction direction;
-        try {
-            direction = Sort.Direction.fromString(pageRequestDto.sortDir());
-        } catch (IllegalArgumentException e) {
-            direction = Sort.Direction.DESC;
-            log.warn("Invalid sort direction '{}', defaulting to DESC", pageRequestDto.sortDir());
-        }
-
+        Sort.Direction direction = Sort.Direction.fromString(pageRequestDto.sortDir());
         Sort sort = Sort.by(direction, pageRequestDto.sortBy());
+
         Pageable pageable = PageRequest.of(pageRequestDto.page(), pageRequestDto.size(), sort);
 
         // Assuming candidateRepository extends JpaSpecificationExecutor<Candidate> or has a custom query method
@@ -117,10 +117,10 @@ public class CandidateServiceImpl implements ICandidateService {
     public CandidateResponseDto updateCandidate(UUID candidateId, UpdateCandidateRequestDto dto) {
         log.info("Updating candidate with id '{}'", candidateId);
 
-        validationService.validateUpdateRequest(candidateId, dto);
-
         Candidate existing = candidateRepository.findById(candidateId)
                 .orElseThrow(() -> new ResourceNotFoundException("Candidate", "id", candidateId.toString()));
+
+        validationService.validateUpdateRequest(existing, dto);
 
         mappingService.updateEntity(existing, dto);
         Candidate updated = candidateRepository.save(existing);
@@ -132,15 +132,16 @@ public class CandidateServiceImpl implements ICandidateService {
     @Override
     @Transactional
     public CandidateResponseDto partialUpdateCandidate(UUID candidateId, PartialUpdateCandidateRequestDto dto) {
+
         log.info("Partially updating candidate with id '{}'", candidateId);
 
-        validationService.validatePartialUpdateRequest(candidateId, dto);
-
-        Candidate existing = candidateRepository.findById(candidateId)
+        Candidate existingCandidate = candidateRepository.findById(candidateId)
                 .orElseThrow(() -> new ResourceNotFoundException("Candidate", "id", candidateId.toString()));
 
-        mappingService.partialUpdateEntity(existing, dto);
-        Candidate updated = candidateRepository.save(existing);
+        validationService.validatePartialUpdateRequest(existingCandidate, dto);
+
+        mappingService.partialUpdateEntity(existingCandidate, dto);
+        Candidate updated = candidateRepository.save(existingCandidate);
 
         log.info("Candidate with id '{}' partially updated successfully", candidateId);
         return mappingService.toResponseDto(updated);
@@ -166,8 +167,8 @@ public class CandidateServiceImpl implements ICandidateService {
 
     private void sendStatusChangedCommunication(Candidate candidate) {
         CandidateStatusChangedEvent event = new CandidateStatusChangedEvent(
-                candidate.getCandidateId(),
-                candidate.getFullName(),
+                candidate.getId(),
+                candidate.getFirstName(),
                 candidate.getJobId() + "",
                 "default client name",
                 candidate.getStatus().name(),
@@ -245,6 +246,21 @@ public class CandidateServiceImpl implements ICandidateService {
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    /**
+     * Utility method to mask the email for safe logging.
+     * Example: "jo****@domain.com"
+     */
+    private String maskEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            return "****";
+        }
+        int atIndex = email.indexOf('@');
+        if (atIndex <= 2) { // very short local-part
+            return "****" + email.substring(atIndex);
+        }
+        return email.substring(0, 2) + "****" + email.substring(atIndex);
     }
 }
 

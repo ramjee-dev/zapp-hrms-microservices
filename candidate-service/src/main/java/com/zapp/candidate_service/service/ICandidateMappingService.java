@@ -16,5 +16,6 @@ public interface ICandidateMappingService {
 
     CandidateResponseDto toResponseDto(Candidate candidate);
 
-    List<CandidateResponseDto> toResponseDtoList(List<Candidate> jobs);
+    List<CandidateResponseDto> toResponseDtoList(List<Candidate> candidates);
+
 }

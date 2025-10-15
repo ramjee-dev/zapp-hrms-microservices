@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface IUserMappingService {
 
-    User toEntity(CreateUserDto dto);
+    User toEntity(CreateUserRequestDto dto);
 
-    void updateEntity(User user, UpdateUserDto dto);
+    void updateEntity(User user, UpdateUserRequestDto dto);
 
-    void partialUpdateEntity(User user, PartialUpdateUserDto dto);
+    void partialUpdateEntity(User user, PartialUpdateUserRequestDto dto);
 
     UserResponseDto toResponseDto(User user);
 
-    List<UserResponseDto> toResponseDtoList(List<User> jobs);
+    List<UserResponseDto> toResponseDtoList(List<User> users);
 }

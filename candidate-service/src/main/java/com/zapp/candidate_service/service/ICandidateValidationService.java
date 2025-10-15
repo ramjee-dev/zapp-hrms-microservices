@@ -14,9 +14,9 @@ public interface ICandidateValidationService {
 
     void validateCreateRequest(CreateCandidateRequestDto dto);
 
-    void validateUpdateRequest(UUID candidateId, UpdateCandidateRequestDto dto);
+    void validateUpdateRequest(Candidate existingCandidate, UpdateCandidateRequestDto dto);
 
-    void validatePartialUpdateRequest(UUID candidateId, PartialUpdateCandidateRequestDto dto);
+    void validatePartialUpdateRequest(Candidate existingCandidate, PartialUpdateCandidateRequestDto dto);
 
     void validateStatusTransition(Candidate candidate, CandidateStatus newStatus);
 

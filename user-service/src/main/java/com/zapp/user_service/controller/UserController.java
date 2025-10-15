@@ -1,8 +1,5 @@
 package com.zapp.user_service.controller;
 
-import com.zapp.user_service.dto.ErrorResponseDto;
-import com.zapp.user_service.dto.UserDto;
-import com.zapp.user_service.entity.User;
 import com.zapp.user_service.service.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

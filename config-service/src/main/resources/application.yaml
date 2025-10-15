@@ -1,0 +1,17 @@
+server:
+  port: 8071
+
+spring:
+  application:
+    name: config-service
+  profiles:
+    active: git
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/ramjee-dev/hrms-config-repo.git
+          default-label: main
+          timeout: 5
+          cloneOnStart: true
+          force-pull: true

@@ -1,9 +1,12 @@
-server:
-  port: 8081
+
 
 spring:
   application:
-    name: client-service
+    name: clients-service
+  profiles:
+    active: prod
+  config:
+    import: configserver:http://localhost:8071/
 
   datasource:
     url: jdbc:h2:mem:testdb

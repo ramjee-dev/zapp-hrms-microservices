@@ -1,9 +1,12 @@
-server:
-  port: 8082
+
 
 spring:
   application:
-    name: job-service
+    name: jobs-service
+  profiles:
+    active: prod
+  config:
+    import: configserver:http://localhost:8071/
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver

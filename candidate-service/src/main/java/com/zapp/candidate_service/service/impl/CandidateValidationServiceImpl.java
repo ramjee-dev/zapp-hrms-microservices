@@ -30,6 +30,10 @@ public class CandidateValidationServiceImpl implements ICandidateValidationServi
 
     @Override
     public void validateCreateRequest(CreateCandidateRequestDto dto) {
+
+        // Normalize and mask email for safe logging
+        final String safeEmail = (dto.email() == null) ? "" : dto.email().trim();
+
         log.debug("Validating create candidate request: email='{}', jobId={}", dto.email(), dto.jobId());
 
         List<String> errors = new ArrayList<>();
@@ -70,22 +74,17 @@ public class CandidateValidationServiceImpl implements ICandidateValidationServi
     }
 
     @Override
-    public void validateUpdateRequest(UUID candidateId, UpdateCandidateRequestDto dto) {
-        log.debug("Validating update for candidate '{}'", candidateId);
+    public void validateUpdateRequest(Candidate existingCandidate, UpdateCandidateRequestDto dto) {
+
+        log.debug("Validating update for candidate '{}'", existingCandidate.getId());
 
         List<String> errors = new ArrayList<>();
-
-        // Validate candidate existence
-        if (!candidateRepository.existsById(candidateId)) {
-            log.warn("Candidate not found for update, id={}", candidateId);
-            throw new ResourceNotFoundException("Candidate", "id", candidateId.toString());
-        }
 
         // Validate email uniqueness (for update, exclude current candidate)
         if (dto.email() != null) {
             String email = dto.email().trim();
             var existing = candidateRepository.findByEmailIgnoreCase(email);
-            if (existing.isPresent() && !existing.get().getId().equals(candidateId)) {
+            if (existing.isPresent() && !existing.get().getId().equals(existingCandidate.getId())) {
                 errors.add("Email is already used by another candidate.");
             }
         }
@@ -98,29 +97,24 @@ public class CandidateValidationServiceImpl implements ICandidateValidationServi
         // Additional validations (e.g., mandatory fields) if needed
 
         if (!errors.isEmpty()) {
-            log.warn("Candidate update validation failed for id={}: {}", candidateId, errors);
+            log.warn("Candidate update validation failed for id={}: {}", existingCandidate.getId(), errors);
             throw new BusinessValidationException("Validation failed for candidate update.", errors);
         }
-        log.info("Candidate update validation succeeded for id={}", candidateId);
+        log.info("Candidate update validation succeeded for id={}", existingCandidate.getId());
     }
 
     @Override
-    public void validatePartialUpdateRequest(UUID candidateId, PartialUpdateCandidateRequestDto dto) {
-        log.debug("Validating partial update for candidate '{}'", candidateId);
+    public void validatePartialUpdateRequest(Candidate existingCandidate, PartialUpdateCandidateRequestDto dto) {
+
+        log.debug("Validating partial update for candidate '{}'", existingCandidate);
 
         List<String> errors = new ArrayList<>();
-
-        // Validate candidate existence
-        if (!candidateRepository.existsById(candidateId)) {
-            log.warn("Candidate not found for partial update, id={}", candidateId);
-            throw new ResourceNotFoundException("Candidate", "id", candidateId.toString());
-        }
 
         // Validate email uniqueness if email is present
         if (dto.email() != null) {
             String email = dto.email().trim();
             var existing = candidateRepository.findByEmailIgnoreCase(email);
-            if (existing.isPresent() && !existing.get().getId().equals(candidateId)) {
+            if (existing.isPresent() && !existing.get().getId().equals(existingCandidate.getId())) {
                 errors.add("Email is already used by another candidate.");
             }
         }
@@ -131,10 +125,10 @@ public class CandidateValidationServiceImpl implements ICandidateValidationServi
         }
 
         if (!errors.isEmpty()) {
-            log.warn("Candidate partial update validation failed for id={}: {}", candidateId, errors);
+            log.warn("Candidate partial update validation failed for id={}: {}", existingCandidate.getId(), errors);
             throw new BusinessValidationException("Validation failed for candidate partial update.", errors);
         }
-        log.info("Candidate partial update validation succeeded for id={}", candidateId);
+        log.info("Candidate partial update validation succeeded for id={}",existingCandidate.getId());
     }
 
     @Override

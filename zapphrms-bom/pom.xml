@@ -6,10 +6,9 @@
 	<artifactId>zapphrms-bom</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>zapphrms-bom</name>
-	<description>Common BOM for ZappHrms Microservices</description>
+	<description>Common BOM for Zapp HRMS microservices </description>
 	<packaging>pom</packaging>
 	<properties>
-		<common-lib.version>1.0.0</common-lib.version>
 		<spring-boot.version>3.4.1</spring-boot.version>
 		<java.version>21</java.version>
 		<maven.compiler.source>21</maven.compiler.source>
@@ -21,17 +20,11 @@
 		<otel.version>2.11.0</otel.version>
 		<micrometer.version>1.14.2</micrometer.version>
 		<jib.version>3.4.2</jib.version>
-		<image.tag>s11</image.tag>
+		<image.tag>s20</image.tag>
 	</properties>
-	<modules>
-		<module>common</module>
-	</modules>
+
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+
 	</dependencies>
 
 	<dependencyManagement>
@@ -65,17 +58,17 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>${spring-boot.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
 				<version>${spring-cloud.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-test</artifactId>
-				<version>${spring-boot.version}</version>
-				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

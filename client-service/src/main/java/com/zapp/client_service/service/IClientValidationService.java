@@ -12,9 +12,9 @@ public interface IClientValidationService {
 
     void validateCreateClientRequest(CreateClientRequestDto dto);
 
-    void validateUpdateClientRequest(UUID clientId, UpdateClientRequestDto dto);
+    void validateUpdateClientRequest(Client existingClient, UpdateClientRequestDto dto);
 
-    void validatePartialUpdateClientRequest(UUID clientId, PartialUpdateClientRequestDto dto);
+    void validatePartialUpdateClientRequest(Client existingClient, PartialUpdateClientRequestDto dto);
 
     void validateStatusTransition(Client existingClient, ClientStatus newStatus);
 

@@ -1,4 +1,14 @@
 package com.zapp.user_service.dto;
 
-public record PagedUserResponseDto() {
-}
+import java.util.List;
+
+public record PagedUserResponseDto(
+        int pageNumber,
+        int totalPages,
+        long totalElements,
+        boolean isFirst,
+        boolean isLast,
+        boolean hasNext,
+        boolean hasPrevious,
+        List<UserResponseDto> data
+) {}

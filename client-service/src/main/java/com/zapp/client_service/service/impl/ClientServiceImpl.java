@@ -65,7 +65,7 @@ public class ClientServiceImpl implements IClientService {
         Sort sort = Sort.by(Sort.Direction.fromString(requestDto.sortDir()), requestDto.sortBy());
         Pageable pageable = PageRequest.of(requestDto.page(), requestDto.size(), sort);
 
-        Page<Client> clientPage = clientRepository.findClientsWithFilters(
+        Page<Client> clientPage = clientRepository.findClientsByFilters(
                 requestDto.status(),
                 requestDto.clientType(),
                 requestDto.industry(),
@@ -91,13 +91,13 @@ public class ClientServiceImpl implements IClientService {
     public ClientResponseDto updateClient(UUID clientId, UpdateClientRequestDto updateClientDto) {
         log.info("Updating client with id: {}", clientId);
 
-        validationService.validateUpdateClientRequest(clientId, updateClientDto);
-
-        Client client = clientRepository.findById(clientId)
+        Client existingClient = clientRepository.findById(clientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Client","clientId",clientId+""));
 
-        mappingService.updateEntity(client, updateClientDto);
-        Client updatedClient = clientRepository.save(client);
+        validationService.validateUpdateClientRequest(existingClient, updateClientDto);
+
+        mappingService.updateEntity(existingClient, updateClientDto);
+        Client updatedClient = clientRepository.save(existingClient);
 
         log.info("Successfully updated client with id: {}", clientId);
         return mappingService.toResponseDto(updatedClient);

@@ -5,13 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CandidateAddedEvent {
 
-    private Long candidateId;
+    private UUID id;
     private String candidateName;
     private String jobTitle;
     private String clientName;

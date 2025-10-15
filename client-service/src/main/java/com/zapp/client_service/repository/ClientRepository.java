@@ -20,26 +20,26 @@ import java.util.UUID;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, UUID> {
 
-    // Checks if a client exists with exact name (case-sensitive)
-    boolean existsByName(String name);
+    // Checks if a client exists with exact company name (case-sensitive)
+    boolean existsByCompanyName(String companyName);
 
     // Checks if a client exists with exact email (case-sensitive)
     boolean existsByEmail(String email);
 
     // Checks if a client exists with exact phone number (case-sensitive)
-    boolean existsByPhoneNumber(String phoneNumber);
+    boolean existsByPhone(String phone); // match with entity field name
 
-    // Finds a client by name ignoring case, returns Optional
-    @Query("SELECT c FROM Client c WHERE LOWER(c.name) = LOWER(:name)")
-    Optional<Client> findByNameIgnoreCase(@Param("name") String name);
+    // Finds a client by company name ignoring case, returns Optional
+    @Query("SELECT c FROM Client c WHERE LOWER(c.companyName) = LOWER(:companyName)")
+    Optional<Client> findByCompanyNameIgnoreCase(@Param("companyName") String companyName);
 
-    // Checks if a client with given name exists excluding a specific client id (for update uniqueness)
-    boolean existsByNameAndIdNot(@Param("name") String name, @Param("id") UUID id);
+    // Checks if a client with given company name exists excluding a specific client id
+    boolean existsByCompanyNameAndIdNot(@Param("companyName") String companyName, @Param("id") UUID id);
 
     // Checks if email exists ignoring case, for validation purposes
     boolean existsByEmailIgnoreCase(String email);
 
-    // Fetch clients by status – if you expect large list, consider pagination for scalability
+    // Fetch clients by status
     List<Client> findByStatus(ClientStatus status);
 
     // Dynamic filtering by optional criteria with pagination support
@@ -58,5 +58,5 @@ public interface ClientRepository extends JpaRepository<Client, UUID> {
             @Param("country") String country,
             @Param("companyName") String companyName,
             Pageable pageable);
-
 }
+

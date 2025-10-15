@@ -7,7 +7,6 @@ import com.zapp.job_service.entity.Job;
 import com.zapp.job_service.enums.JobStatus;
 import com.zapp.job_service.exception.BusinessValidationException;
 import com.zapp.job_service.exception.JobAlreadyExistsException;
-import com.zapp.job_service.exception.ResourceNotFoundException;
 import com.zapp.job_service.repository.JobRepository;
 import com.zapp.job_service.service.IJobValidationService;
 import lombok.RequiredArgsConstructor;
@@ -60,15 +59,10 @@ public class JobValidationServiceImpl implements IJobValidationService {
     }
 
     @Override
-    public void validateUpdateJobRequest(UUID jobId, UpdateJobRequestDto dto) {
-        log.debug("Validating job update for jobId={}", jobId);
+    public void validateUpdateJobRequest(Job existingJob, UpdateJobRequestDto dto) {
+        log.debug("Validating job update for jobId={}", existingJob.getId());
 
         List<String> errors = new ArrayList<>();
-
-        // Check job existence
-        Job existingJob = jobRepository.findById(jobId).orElseThrow(() ->
-                new ResourceNotFoundException("Job", "id", jobId.toString())
-        );
 
         // Positions available must be positive if present
         if (dto.positionsAvailable() != null && dto.positionsAvailable() <= 0) {
@@ -88,7 +82,7 @@ public class JobValidationServiceImpl implements IJobValidationService {
         // Check for duplicate title under same client (case-insensitive) excluding current job
         if (dto.title() != null && existingJob.getClientId() != null) {
             Optional<Job> duplicateJob = jobRepository.findByClientIdAndTitleIgnoreCase(existingJob.getClientId(), dto.title().trim());
-            if (duplicateJob.isPresent() && !duplicateJob.get().getId().equals(jobId)) {
+            if (duplicateJob.isPresent() && !duplicateJob.get().getId().equals(existingJob.getId())) {
                 throw new JobAlreadyExistsException("A job with title '" + dto.title().trim()
                         + "' already exists for client ID " + existingJob.getClientId());
             }
@@ -97,26 +91,22 @@ public class JobValidationServiceImpl implements IJobValidationService {
         // Add additional update validations here...
 
         if (!errors.isEmpty()) {
-            log.warn("Job update validation failed for jobId {}: {}", jobId, errors);
+            log.warn("Job update validation failed for jobId {}: {}", existingJob.getId(), errors);
             throw new BusinessValidationException("Job update validation failed", errors);
         }
 
-        log.info("Job update validation passed for jobId={}", jobId);
+        log.info("Job update validation passed for jobId={}", existingJob.getId());
     }
 
     /**
      * OPTIONAL:
      * Add validatePartialUpdateJobRequest if your service supports PATCH
      */
-    public void validatePartialUpdateJobRequest(UUID jobId, PartialUpdateJobRequestDto dto) {
+    public void validatePartialUpdateJobRequest(Job existingJob, PartialUpdateJobRequestDto dto) {
 
-        log.debug("Validating partial update for jobId={}", jobId);
+        log.debug("Validating partial update for jobId={}", existingJob.getId());
 
         List<String> errors = new ArrayList<>();
-
-        Job existingJob = jobRepository.findById(jobId).orElseThrow(() ->
-                new ResourceNotFoundException("Job", "id", jobId.toString())
-        );
 
         if (dto.positionsAvailable() != null && dto.positionsAvailable() <= 0) {
             errors.add("Positions available must be greater than 0");
@@ -128,18 +118,18 @@ public class JobValidationServiceImpl implements IJobValidationService {
 
         if (dto.title() != null) {
             Optional<Job> duplicateJob = jobRepository.findByClientIdAndTitleIgnoreCase(existingJob.getClientId(), dto.title().trim());
-            if (duplicateJob.isPresent() && !duplicateJob.get().getId().equals(jobId)) {
+            if (duplicateJob.isPresent() && !duplicateJob.get().getId().equals(existingJob.getId())) {
                 throw new JobAlreadyExistsException("A job with title '" + dto.title().trim()
                         + "' already exists for client ID " + existingJob.getClientId());
             }
         }
 
         if (!errors.isEmpty()) {
-            log.warn("Job partial update validation failed for jobId {}: {}", jobId, errors);
+            log.warn("Job partial update validation failed for jobId {}: {}", existingJob.getId(), errors);
             throw new BusinessValidationException("Job partial update validation failed", errors);
         }
 
-        log.info("Job partial update validation passed for jobId={}", jobId);
+        log.info("Job partial update validation passed for jobId={}", existingJob.getId());
     }
 
     @Override

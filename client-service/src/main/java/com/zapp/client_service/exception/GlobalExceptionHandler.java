@@ -3,6 +3,7 @@ package com.zapp.client_service.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -83,6 +84,27 @@ public class GlobalExceptionHandler {
         });
         problemDetail.setProperty("fieldErrors", errors);
 
+        return ResponseEntity.badRequest().body(problemDetail);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ProblemDetail> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
+        log.warn("Data integrity violation: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, "Duplicate or invalid data"
+        );
+        problemDetail.setTitle("Data Integrity Error");
+        problemDetail.setType(URI.create(BASE_PROBLEM_URI + "data-integrity"));
+        enrichMetadata(problemDetail, request);
+
+        // Optionally, parse ex.getMessage() or the cause to check if this was for the "email" unique constraint
+        if (ex.getCause() != null && ex.getCause().getMessage() != null
+                && ex.getCause().getMessage().toLowerCase().contains("email")) {
+            problemDetail.setDetail("Candidate with the given email already exists.");
+            Map<String, String> fieldErrors = new HashMap<>();
+            fieldErrors.put("email", "Candidate with the given email already exists.");
+            problemDetail.setProperty("fieldErrors", fieldErrors);
+        }
         return ResponseEntity.badRequest().body(problemDetail);
     }
 

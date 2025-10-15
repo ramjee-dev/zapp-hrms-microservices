@@ -99,8 +99,9 @@ public class JobServiceImpl implements IJobService {
 
         log.info("Updating job with id: {}", jobId);
 
-        validationService.validateUpdateJobRequest(jobId, updateJobRequestDto);
         Job existingJob = findJobOrThrow(jobId);
+
+        validationService.validateUpdateJobRequest(existingJob, updateJobRequestDto);
 
         mappingService.updateEntity(existingJob, updateJobRequestDto);
 

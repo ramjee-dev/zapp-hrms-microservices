@@ -61,18 +61,13 @@ public class ClientValidationServiceImpl implements IClientValidationService {
     }
 
     @Override
-    public void validateUpdateClientRequest(UUID clientId, UpdateClientRequestDto dto) {
-        log.debug("Validating update for client: {}", clientId);
+    public void validateUpdateClientRequest(Client existingClient, UpdateClientRequestDto dto) {
+
+        log.debug("Validating update for client: {}", existingClient.getId());
 
         List<String> errors = new ArrayList<>();
 
-        // Check the client exists (defensive)
-        if (!clientRepository.existsById(clientId)) {
-            log.warn("Client not found for update, id={}", clientId);
-            throw new ResourceNotFoundException("Client", "id", clientId.toString());
-        }
-
-        // Trim and validate email uniqueness if email is modifiable in update DTO (adjust if applicable)
+//         Trim and validate email uniqueness if email is modifiable in update DTO (adjust if applicable)
 //        if (dto.email() != null) {
 //            String email = dto.email().trim();
 //            if (clientRepository.existsByEmailIgnoreCase(email)) {
@@ -92,25 +87,21 @@ public class ClientValidationServiceImpl implements IClientValidationService {
         // Add other necessary update validations here
 
         if (!errors.isEmpty()) {
-            log.warn("Client update validation failed for client {}: {}", clientId, errors);
+            log.warn("Client update validation failed for client {}: {}", existingClient.getId(), errors);
             throw new BusinessValidationException("Client update validation failed", errors);
         }
 
-        log.info("Client update validation passed for client: {}", clientId);
+        log.info("Client update validation passed for client: {}", existingClient.getId());
     }
 
     /**
      * Optional: Adds validation support for PartialUpdateClientRequestDto
      */
-    public void validatePartialUpdateClientRequest(UUID clientId, PartialUpdateClientRequestDto dto) {
-        log.debug("Validating partial update for client: {}", clientId);
+    public void validatePartialUpdateClientRequest(Client existingClient, PartialUpdateClientRequestDto dto) {
+
+        log.debug("Validating partial update for client: {}", existingClient.getId());
 
         List<String> errors = new ArrayList<>();
-
-        if (!clientRepository.existsById(clientId)) {
-            log.warn("Client not found for partial update: {}", clientId);
-            throw new ResourceNotFoundException("Client", "id", clientId.toString());
-        }
 
         // Example: email uniqueness if email is set in partial update
 //        if (dto.email() != null) {
@@ -126,11 +117,11 @@ public class ClientValidationServiceImpl implements IClientValidationService {
         }
 
         if (!errors.isEmpty()) {
-            log.warn("Client partial update validation failed for client {}: {}", clientId, errors);
+            log.warn("Client partial update validation failed for client {}: {}", existingClient.getId(), errors);
             throw new BusinessValidationException("Client partial update validation failed", errors);
         }
 
-        log.info("Client partial update validation passed for client: {}", clientId);
+        log.info("Client partial update validation passed for client: {}", existingClient.getId());
     }
 
     @Override
